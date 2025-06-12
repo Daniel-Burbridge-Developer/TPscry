@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Input } from './ui/input';
 import { useDebounce } from '~/hooks/useDebounce';
+import { useSearchRoutesQuery } from '~/hooks/useSearchRoutesQuery';
 
 export function FetchingSearchBar() {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-
-  // This effect will only run when the debounced value changes
-  // (i.e., after the user stops typing for 300ms)
-  useEffect(() => {
-    if (debouncedSearchTerm) {
-      // Here you would typically make an API call or filter data
-      console.log('Searching for:', debouncedSearchTerm);
-    }
-  }, [debouncedSearchTerm]);
+  const { data: routes, isLoading } = useSearchRoutesQuery(
+    debouncedSearchTerm || '',
+    {
+      enabled: Boolean(debouncedSearchTerm),
+    },
+  );
 
   return (
     <div className="w-full max-w-md">
@@ -26,6 +24,17 @@ export function FetchingSearchBar() {
         <p className="mt-2 text-sm text-gray-500">
           Searching for: {debouncedSearchTerm}
         </p>
+      )}
+      {isLoading && <p className="mt-2 text-sm text-gray-500">Loading...</p>}
+      {routes && (
+        <div className="mt-2">
+          <p className="text-sm text-gray-500">Found {routes.length} routes:</p>
+          <ul className="list-disc pl-5">
+            {routes.map((route) => (
+              <li key={route.id}>{route.shortName || route.longName}</li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
