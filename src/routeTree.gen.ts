@@ -8,35 +8,88 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createServerRootRoute } from '@tanstack/react-start/server'
+
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlaygroundSearchingRouteImport } from './routes/playground/searching'
+import { ServerRoute as ApiRouteRouteIdTripsServerRouteImport } from './routes/api/route.$routeId.trips'
+import { ServerRoute as ApiFuzzyRouteSearchSlugServerRouteImport } from './routes/api/fuzzy.route.$searchSlug'
+
+const rootServerRouteImport = createServerRootRoute()
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaygroundSearchingRoute = PlaygroundSearchingRouteImport.update({
+  id: '/playground/searching',
+  path: '/playground/searching',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRouteRouteIdTripsServerRoute =
+  ApiRouteRouteIdTripsServerRouteImport.update({
+    id: '/api/route/$routeId/trips',
+    path: '/api/route/$routeId/trips',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ApiFuzzyRouteSearchSlugServerRoute =
+  ApiFuzzyRouteSearchSlugServerRouteImport.update({
+    id: '/api/fuzzy/route/$searchSlug',
+    path: '/api/fuzzy/route/$searchSlug',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/playground/searching': typeof PlaygroundSearchingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/playground/searching': typeof PlaygroundSearchingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/playground/searching': typeof PlaygroundSearchingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/playground/searching'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/playground/searching'
+  id: '__root__' | '/' | '/playground/searching'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PlaygroundSearchingRoute: typeof PlaygroundSearchingRoute
+}
+export interface FileServerRoutesByFullPath {
+  '/api/fuzzy/route/$searchSlug': typeof ApiFuzzyRouteSearchSlugServerRoute
+  '/api/route/$routeId/trips': typeof ApiRouteRouteIdTripsServerRoute
+}
+export interface FileServerRoutesByTo {
+  '/api/fuzzy/route/$searchSlug': typeof ApiFuzzyRouteSearchSlugServerRoute
+  '/api/route/$routeId/trips': typeof ApiRouteRouteIdTripsServerRoute
+}
+export interface FileServerRoutesById {
+  __root__: typeof rootServerRouteImport
+  '/api/fuzzy/route/$searchSlug': typeof ApiFuzzyRouteSearchSlugServerRoute
+  '/api/route/$routeId/trips': typeof ApiRouteRouteIdTripsServerRoute
+}
+export interface FileServerRouteTypes {
+  fileServerRoutesByFullPath: FileServerRoutesByFullPath
+  fullPaths: '/api/fuzzy/route/$searchSlug' | '/api/route/$routeId/trips'
+  fileServerRoutesByTo: FileServerRoutesByTo
+  to: '/api/fuzzy/route/$searchSlug' | '/api/route/$routeId/trips'
+  id: '__root__' | '/api/fuzzy/route/$searchSlug' | '/api/route/$routeId/trips'
+  fileServerRoutesById: FileServerRoutesById
+}
+export interface RootServerRouteChildren {
+  ApiFuzzyRouteSearchSlugServerRoute: typeof ApiFuzzyRouteSearchSlugServerRoute
+  ApiRouteRouteIdTripsServerRoute: typeof ApiRouteRouteIdTripsServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,12 +101,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playground/searching': {
+      id: '/playground/searching'
+      path: '/playground/searching'
+      fullPath: '/playground/searching'
+      preLoaderRoute: typeof PlaygroundSearchingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
+}
+declare module '@tanstack/react-start/server' {
+  interface ServerFileRoutesByPath {
+    '/api/route/$routeId/trips': {
+      id: '/api/route/$routeId/trips'
+      path: '/api/route/$routeId/trips'
+      fullPath: '/api/route/$routeId/trips'
+      preLoaderRoute: typeof ApiRouteRouteIdTripsServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/fuzzy/route/$searchSlug': {
+      id: '/api/fuzzy/route/$searchSlug'
+      path: '/api/fuzzy/route/$searchSlug'
+      fullPath: '/api/fuzzy/route/$searchSlug'
+      preLoaderRoute: typeof ApiFuzzyRouteSearchSlugServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PlaygroundSearchingRoute: PlaygroundSearchingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiFuzzyRouteSearchSlugServerRoute: ApiFuzzyRouteSearchSlugServerRoute,
+  ApiRouteRouteIdTripsServerRoute: ApiRouteRouteIdTripsServerRoute,
+}
+export const serverRouteTree = rootServerRouteImport
+  ._addFileChildren(rootServerRouteChildren)
+  ._addFileTypes<FileServerRouteTypes>()

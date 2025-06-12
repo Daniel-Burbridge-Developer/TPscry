@@ -15,7 +15,7 @@ const DEFAULT_CACHE_LIFETIME_MS = 60 * 60 * 1000; // 1 Hour
 export const apiFetch = async <T>(
   url: string,
   data?: RequestPayload,
-  options: ApiFetchOptions = {}
+  options: ApiFetchOptions = {},
 ): Promise<T> => {
   const method = options.method?.toUpperCase() || 'GET';
   const fullUrl = url;
@@ -33,7 +33,7 @@ export const apiFetch = async <T>(
       Date.now() - cachedEntry.timestamp < effectiveCacheLifetime
     ) {
       console.log(
-        `Cache hit for: ${fullUrl} (TTL: ${effectiveCacheLifetime / 1000}s)`
+        `Cache hit for: ${fullUrl} (TTL: ${effectiveCacheLifetime / 1000}s)`,
       );
       // Validate cached data if a schema is provided
       if (options.responseSchema) {
@@ -41,7 +41,7 @@ export const apiFetch = async <T>(
           return options.responseSchema.parse(cachedEntry.data) as T;
         } catch (validationError) {
           console.error(
-            `Cached data for ${fullUrl} failed validation! Re-fetching.`
+            `Cached data for ${fullUrl} failed validation! Re-fetching.`,
           );
           cache.delete(fullUrl); // Invalidate bad cache
         }
@@ -68,7 +68,7 @@ export const apiFetch = async <T>(
       requestBody = JSON.stringify(data);
     } else {
       console.warn(
-        `Warning: Data provided for a ${method} request. It will be ignored as ${method} requests typically don't have a body. Consider using query parameters for GET.`
+        `Warning: Data provided for a ${method} request. It will be ignored as ${method} requests typically don't have a body. Consider using query parameters for GET.`,
       );
       requestBody = undefined;
     }
@@ -113,7 +113,7 @@ export const apiFetch = async <T>(
         if (error instanceof ZodError) {
           console.error(`Validation error for ${fullUrl}:`, error.issues);
           throw new Error(
-            `Invalid API response format for ${fullUrl}: ${error.message}`
+            `Invalid API response format for ${fullUrl}: ${error.message}`,
           );
         }
         throw error; // Re-throw other types of errors
@@ -122,7 +122,7 @@ export const apiFetch = async <T>(
       // If no schema is provided, assume the type T and proceed
       validatedData = rawData as T;
       console.warn(
-        `No response schema provided for ${fullUrl}. Data is not runtime validated.`
+        `No response schema provided for ${fullUrl}. Data is not runtime validated.`,
       );
     }
 
@@ -130,7 +130,7 @@ export const apiFetch = async <T>(
     if (method === 'GET' && effectiveCacheLifetime > 0) {
       cache.set(fullUrl, { data: validatedData, timestamp: Date.now() });
       console.log(
-        `Cached new data for: ${fullUrl} (TTL: ${effectiveCacheLifetime / 1000}s)`
+        `Cached new data for: ${fullUrl} (TTL: ${effectiveCacheLifetime / 1000}s)`,
       );
     }
 
