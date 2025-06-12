@@ -13,6 +13,10 @@ import { NotFound } from '~/components/NotFound'
 import appCss from '~/styles/app.css?url'
 import { seo } from '~/utils/seo'
 
+import { Analytics } from "@vercel/analytics/next"
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -25,8 +29,8 @@ export const Route = createRootRoute({
       },
       ...seo({
         title:
-          'TanStack Start | Type-Safe, Client-First, Full-Stack React Framework',
-        description: `TanStack Start is a type-safe, client-first, full-stack React framework. `,
+          'TP Scry',
+        description: `Tracking Transperth in real-time`,
       }),
     ],
     links: [
@@ -78,16 +82,22 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const queryClient = new QueryClient();
   return (
     <html>
       <head>
         <HeadContent />
       </head>
       <body>
-        <hr />
-        {children}
-        <TanStackRouterDevtools position="bottom-right" />
-        <Scripts />
+        <QueryClientProvider client={queryClient}>
+          <hr />
+          {children}
+          <TanStackRouterDevtools position='bottom-right' />
+          <ReactQueryDevtools initialIsOpen={false} />
+          <TanStackRouterDevtools position="bottom-right" />
+          <Analytics/>
+          <Scripts />
+        </QueryClientProvider>
       </body>
     </html>
   )
