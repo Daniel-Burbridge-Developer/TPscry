@@ -46,11 +46,11 @@ export const ServerRoute = createServerFileRoute(
         )
         .limit(5);
 
-      console.log('🔍 Found routes:', matchingRoutes);
+      console.log('🔍 Found routes:', matchingRoutes.length);
 
       // Validate routes against schema
       const validatedRoutes = routeSchema.array().parse(matchingRoutes);
-      console.log('🔍 Validated routes:', validatedRoutes);
+      console.log('🔍 Validated routes:', validatedRoutes.length);
 
       return json(validatedRoutes);
     } catch (error) {

@@ -48,7 +48,7 @@ export const ServerRoute = createServerFileRoute(
       `);
 
       const routeTrips = result.rows;
-      console.log('🚌 Found trips:', routeTrips);
+      console.log('🚌 Found trips:', routeTrips.length);
 
       if (!routeTrips.length) {
         console.log('🚌 No trips found for routeId:', params.routeId);
@@ -75,11 +75,11 @@ export const ServerRoute = createServerFileRoute(
         ),
       }));
 
-      console.log('🚌 Trips with ensured stops:', tripsWithStops);
+      console.log('🚌 Trips with ensured stops:', tripsWithStops.length);
 
       // Validate trips against schema
       const validatedTrips = TripSelectZodSchema.array().parse(tripsWithStops);
-      console.log('🚌 Validated trips:', validatedTrips);
+      console.log('🚌 Validated trips:', validatedTrips.length);
 
       return json(validatedTrips);
     } catch (error) {
