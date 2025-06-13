@@ -1,13 +1,14 @@
 import { Input } from './ui/input';
-import { useDebounce } from '~/hooks/useDebounce';
 import { useSearchRoutesQuery } from '~/hooks/useSearchRoutesQuery';
 import { useSearchStore } from '~/stores/searchStore';
 
 export function FetchingSearchBar() {
   const searchTerm = useSearchStore((state) => state.searchTerms.routes);
+  const debouncedSearchTerm = useSearchStore(
+    (state) => state.debouncedSearchTerms.routes,
+  );
   const setSearchTerm = useSearchStore((state) => state.setSearchTerm);
 
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { data: routes, isLoading } = useSearchRoutesQuery(
     debouncedSearchTerm,
     {

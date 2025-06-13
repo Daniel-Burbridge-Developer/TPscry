@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useSearchRoutesQuery } from '~/hooks/useSearchRoutesQuery';
-import { useDebounce } from '~/hooks/useDebounce';
 import { useSearchStore } from '~/stores/searchStore';
 
 export const Route = createFileRoute('/playground/ItemContainer')({
@@ -8,8 +7,9 @@ export const Route = createFileRoute('/playground/ItemContainer')({
 });
 
 export function ItemContainer() {
-  const searchTerm = useSearchStore((state) => state.searchTerms.routes);
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const debouncedSearchTerm = useSearchStore(
+    (state) => state.debouncedSearchTerms.routes,
+  );
   const { data: routes, isLoading } = useSearchRoutesQuery(
     debouncedSearchTerm,
     {
