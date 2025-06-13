@@ -14,6 +14,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlaygroundSearchingRouteImport } from './routes/playground/searching'
 import { Route as PlaygroundItemContainerRouteImport } from './routes/playground/ItemContainer'
+import { Route as PlaygroundContainersSearchitemsRouteImport } from './routes/playground/containers/searchitems'
 import { ServerRoute as ApiRouteRouteIdTripsServerRouteImport } from './routes/api/route.$routeId.trips'
 import { ServerRoute as ApiFuzzyRouteSearchSlugServerRouteImport } from './routes/api/fuzzy.route.$searchSlug'
 
@@ -34,6 +35,12 @@ const PlaygroundItemContainerRoute = PlaygroundItemContainerRouteImport.update({
   path: '/playground/ItemContainer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaygroundContainersSearchitemsRoute =
+  PlaygroundContainersSearchitemsRouteImport.update({
+    id: '/playground/containers/searchitems',
+    path: '/playground/containers/searchitems',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiRouteRouteIdTripsServerRoute =
   ApiRouteRouteIdTripsServerRouteImport.update({
     id: '/api/route/$routeId/trips',
@@ -51,30 +58,47 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/playground/ItemContainer': typeof PlaygroundItemContainerRoute
   '/playground/searching': typeof PlaygroundSearchingRoute
+  '/playground/containers/searchitems': typeof PlaygroundContainersSearchitemsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/playground/ItemContainer': typeof PlaygroundItemContainerRoute
   '/playground/searching': typeof PlaygroundSearchingRoute
+  '/playground/containers/searchitems': typeof PlaygroundContainersSearchitemsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/playground/ItemContainer': typeof PlaygroundItemContainerRoute
   '/playground/searching': typeof PlaygroundSearchingRoute
+  '/playground/containers/searchitems': typeof PlaygroundContainersSearchitemsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/playground/ItemContainer' | '/playground/searching'
+  fullPaths:
+    | '/'
+    | '/playground/ItemContainer'
+    | '/playground/searching'
+    | '/playground/containers/searchitems'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/playground/ItemContainer' | '/playground/searching'
-  id: '__root__' | '/' | '/playground/ItemContainer' | '/playground/searching'
+  to:
+    | '/'
+    | '/playground/ItemContainer'
+    | '/playground/searching'
+    | '/playground/containers/searchitems'
+  id:
+    | '__root__'
+    | '/'
+    | '/playground/ItemContainer'
+    | '/playground/searching'
+    | '/playground/containers/searchitems'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PlaygroundItemContainerRoute: typeof PlaygroundItemContainerRoute
   PlaygroundSearchingRoute: typeof PlaygroundSearchingRoute
+  PlaygroundContainersSearchitemsRoute: typeof PlaygroundContainersSearchitemsRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/fuzzy/route/$searchSlug': typeof ApiFuzzyRouteSearchSlugServerRoute
@@ -125,6 +149,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaygroundItemContainerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playground/containers/searchitems': {
+      id: '/playground/containers/searchitems'
+      path: '/playground/containers/searchitems'
+      fullPath: '/playground/containers/searchitems'
+      preLoaderRoute: typeof PlaygroundContainersSearchitemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 declare module '@tanstack/react-start/server' {
@@ -150,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PlaygroundItemContainerRoute: PlaygroundItemContainerRoute,
   PlaygroundSearchingRoute: PlaygroundSearchingRoute,
+  PlaygroundContainersSearchitemsRoute: PlaygroundContainersSearchitemsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
