@@ -1,22 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useSearchRoutesQuery } from '~/hooks/useSearchRoutesQuery';
 import { useDebounce } from '~/hooks/useDebounce';
-import { useQuery } from '@tanstack/react-query';
-
-const searchTermQueryKey = ['globalSearchTerm'];
+import { useSearchStore } from '~/stores/searchStore';
 
 export const Route = createFileRoute('/playground/ItemContainer')({
   component: ItemContainer,
 });
 
 export function ItemContainer() {
-  const { data: searchTerm } = useQuery({
-    queryKey: searchTermQueryKey,
-    queryFn: () => '', // This query does not fetch, it's for client state
-    initialData: '',
-    staleTime: Infinity,
-    gcTime: Infinity,
-  });
+  const searchTerm = useSearchStore((state) => state.searchTerms.routes);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { data: routes, isLoading } = useSearchRoutesQuery(
     debouncedSearchTerm,
