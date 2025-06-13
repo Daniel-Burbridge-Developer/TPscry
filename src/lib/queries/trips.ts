@@ -7,7 +7,6 @@ export const tripByIdQuery = (tripId: string) => ({
     apiFetch(`/api/v1/trip.${tripId}`, undefined, {
       responseSchema: TripSelectZodSchema,
     }),
-  staleTime: 1000 * 60 * 60 * 10, // 10 Hours
 });
 
 export const tripsByRouteQuery = (routeId: string) => ({
@@ -16,5 +15,4 @@ export const tripsByRouteQuery = (routeId: string) => ({
     apiFetch(`/api/v1/trips-by-route.${routeId}`, undefined, {
       responseSchema: TripSelectZodSchema.array(),
     }),
-  staleTime: 1000 * 60 * 60 * 10, // 10 Hours
 });

@@ -5,17 +5,27 @@ import {
   Outlet,
   Scripts,
   createRootRoute,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import * as React from 'react'
-import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
-import { NotFound } from '~/components/NotFound'
-import appCss from '~/styles/app.css?url'
-import { seo } from '~/utils/seo'
+} from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import * as React from 'react';
+import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary';
+import { NotFound } from '~/components/NotFound';
+import appCss from '~/styles/app.css?url';
+import { seo } from '~/utils/seo';
 
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from '@vercel/analytics/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 60 * 12, // 12 hours
+      gcTime: 1000 * 60 * 60 * 24, // 24 hours
+    },
+  },
+});
 
 export const Route = createRootRoute({
   head: () => ({
@@ -28,8 +38,7 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       ...seo({
-        title:
-          'TP Scry',
+        title: 'TP Scry',
         description: `Tracking Transperth in real-time`,
       }),
     ],
@@ -67,22 +76,21 @@ export const Route = createRootRoute({
       <RootDocument>
         <DefaultCatchBoundary {...props} />
       </RootDocument>
-    )
+    );
   },
   notFoundComponent: () => <NotFound />,
   component: RootComponent,
-})
+});
 
 function RootComponent() {
   return (
     <RootDocument>
       <Outlet />
     </RootDocument>
-  )
+  );
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const queryClient = new QueryClient();
   return (
     <html>
       <head>
@@ -92,13 +100,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={queryClient}>
           <hr />
           {children}
-          <TanStackRouterDevtools position='bottom-right' />
+          <TanStackRouterDevtools position="bottom-right" />
           <ReactQueryDevtools initialIsOpen={false} />
           <TanStackRouterDevtools position="bottom-right" />
-          <Analytics/>
+          <Analytics />
           <Scripts />
         </QueryClientProvider>
       </body>
     </html>
-  )
+  );
 }

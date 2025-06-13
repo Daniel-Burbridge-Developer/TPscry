@@ -1,13 +1,23 @@
-import { useEffect, useState } from 'react';
 import { Input } from './ui/input';
 import { useDebounce } from '~/hooks/useDebounce';
 import { useSearchRoutesQuery } from '~/hooks/useSearchRoutesQuery';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
+const searchTermQueryKey = ['globalSearchTerm'];
 
 export function FetchingSearchBar() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const queryClient = useQueryClient();
+  const { data: searchTerm } = useQuery({
+    queryKey: searchTermQueryKey,
+    queryFn: () => '', // This query does not fetch, it's for client state
+    initialData: '',
+    staleTime: Infinity,
+    gcTime: Infinity,
+  });
+
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { data: routes, isLoading } = useSearchRoutesQuery(
-    debouncedSearchTerm || '',
+    debouncedSearchTerm,
     {
       enabled: Boolean(debouncedSearchTerm),
     },
@@ -17,7 +27,9 @@ export function FetchingSearchBar() {
     <div className="w-full max-w-md">
       <Input
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={(e) =>
+          queryClient.setQueryData(searchTermQueryKey, e.target.value)
+        }
         placeholder="Search..."
       />
       {debouncedSearchTerm && (

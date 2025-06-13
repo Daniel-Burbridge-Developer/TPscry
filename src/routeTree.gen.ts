@@ -13,6 +13,7 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlaygroundSearchingRouteImport } from './routes/playground/searching'
+import { Route as PlaygroundItemContainerRouteImport } from './routes/playground/ItemContainer'
 import { ServerRoute as ApiRouteRouteIdTripsServerRouteImport } from './routes/api/route.$routeId.trips'
 import { ServerRoute as ApiFuzzyRouteSearchSlugServerRouteImport } from './routes/api/fuzzy.route.$searchSlug'
 
@@ -26,6 +27,11 @@ const IndexRoute = IndexRouteImport.update({
 const PlaygroundSearchingRoute = PlaygroundSearchingRouteImport.update({
   id: '/playground/searching',
   path: '/playground/searching',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundItemContainerRoute = PlaygroundItemContainerRouteImport.update({
+  id: '/playground/ItemContainer',
+  path: '/playground/ItemContainer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiRouteRouteIdTripsServerRoute =
@@ -43,27 +49,31 @@ const ApiFuzzyRouteSearchSlugServerRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/playground/ItemContainer': typeof PlaygroundItemContainerRoute
   '/playground/searching': typeof PlaygroundSearchingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/playground/ItemContainer': typeof PlaygroundItemContainerRoute
   '/playground/searching': typeof PlaygroundSearchingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/playground/ItemContainer': typeof PlaygroundItemContainerRoute
   '/playground/searching': typeof PlaygroundSearchingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/playground/searching'
+  fullPaths: '/' | '/playground/ItemContainer' | '/playground/searching'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/playground/searching'
-  id: '__root__' | '/' | '/playground/searching'
+  to: '/' | '/playground/ItemContainer' | '/playground/searching'
+  id: '__root__' | '/' | '/playground/ItemContainer' | '/playground/searching'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PlaygroundItemContainerRoute: typeof PlaygroundItemContainerRoute
   PlaygroundSearchingRoute: typeof PlaygroundSearchingRoute
 }
 export interface FileServerRoutesByFullPath {
@@ -108,6 +118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaygroundSearchingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playground/ItemContainer': {
+      id: '/playground/ItemContainer'
+      path: '/playground/ItemContainer'
+      fullPath: '/playground/ItemContainer'
+      preLoaderRoute: typeof PlaygroundItemContainerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 declare module '@tanstack/react-start/server' {
@@ -131,6 +148,7 @@ declare module '@tanstack/react-start/server' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PlaygroundItemContainerRoute: PlaygroundItemContainerRoute,
   PlaygroundSearchingRoute: PlaygroundSearchingRoute,
 }
 export const routeTree = rootRouteImport

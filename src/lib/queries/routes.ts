@@ -7,5 +7,4 @@ export const searchRoutesQuery = (searchSlug: string) => ({
     apiFetch(`/api/fuzzy/route/${searchSlug}`, undefined, {
       responseSchema: routeSchema.array(),
     }),
-  staleTime: 1000 * 60 * 60 * 10, // 10 Hours
 });
