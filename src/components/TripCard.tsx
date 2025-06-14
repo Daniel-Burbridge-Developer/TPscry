@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTripLiveStatus } from '~/hooks/useTripLiveStatus';
 import { Trip } from '~/schemas/index';
+import { useTripLiveDetails } from '~/hooks/useTripLiveDetails';
+import { LiveTripProgress } from '~/components/LiveTripProgress';
 
 interface TripCardProps {
   routeName: string;
@@ -9,6 +11,17 @@ interface TripCardProps {
 
 const TripCard = ({ trip, routeName }: TripCardProps) => {
   const { isLive, fleetId } = useTripLiveStatus(trip, routeName, {
+    pollingIntervalMs: 10000,
+  });
+
+  const [isExpanded, setIsExpanded] = React.useState(false);
+
+  const {
+    data: liveDetails,
+    isLoading: liveLoading,
+    currentStop,
+  } = useTripLiveDetails(fleetId, {
+    enabled: isLive && !!fleetId && isExpanded,
     pollingIntervalMs: 10000,
   });
 
@@ -35,6 +48,33 @@ const TripCard = ({ trip, routeName }: TripCardProps) => {
         <span className="text-xs text-muted-foreground">
           Stops: {trip.stops.length}
         </span>
+      )}
+
+      <button
+        className="absolute top-2 right-2 text-xs text-primary underline disabled:opacity-40"
+        disabled={!isLive}
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsExpanded((prev) => !prev);
+        }}
+      >
+        {isExpanded ? 'Hide live progress' : 'Show live progress'}
+      </button>
+
+      {isExpanded && (
+        <div className="mt-3">
+          {liveLoading && (
+            <p className="text-xs text-muted-foreground">
+              Loading live progress…
+            </p>
+          )}
+          {liveDetails && (
+            <LiveTripProgress
+              stops={liveDetails.stops}
+              currentStopId={currentStop?.stopNumber}
+            />
+          )}
+        </div>
       )}
     </li>
   );
