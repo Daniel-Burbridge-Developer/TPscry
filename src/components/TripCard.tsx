@@ -1,7 +1,6 @@
+import React from 'react';
+import { useTripLiveStatus } from '~/hooks/useTripLiveStatus';
 import { Trip } from '~/schemas/index';
-import { useExternalStopData } from '~/hooks/useExternalStopData';
-import { ExternalStopData } from '~/schemas/externalStopDataSchema';
-import React, { useEffect, useMemo, useState } from 'react';
 
 interface TripCardProps {
   routeName: string;
@@ -9,41 +8,9 @@ interface TripCardProps {
 }
 
 const TripCard = ({ trip, routeName }: TripCardProps) => {
-  // Build up to three candidate stop IDs: first, middle, last.
-  const stopIds = useMemo(() => {
-    const ids = trip.stops?.map((s) => s.id) ?? [];
-    if (ids.length === 0) return [];
-    const first = ids[0];
-    const last = ids[ids.length - 1];
-    const middle = ids[Math.floor(ids.length / 2)];
-    // Deduplicate while preserving order
-    return Array.from(new Set([first, middle, last]));
-  }, [trip.stops]);
-
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const currentStopId = stopIds[currentIdx] ?? '';
-  const [isLive, setIsLive] = useState(false);
-
-  const { data: externalData } = useExternalStopData(currentStopId, {
-    enabled: Boolean(currentStopId) && !isLive, // once live, stop fetching further
-    refetchInterval: isLive ? undefined : 10000,
+  const { isLive, fleetId } = useTripLiveStatus(trip, routeName, {
+    pollingIntervalMs: 10000,
   });
-
-  // Whenever we get data, determine live status or continue searching.
-  useEffect(() => {
-    if (!externalData) return;
-
-    const liveFound = (externalData as ExternalStopData[]).some(
-      (entry) => entry.busNumber === routeName && entry.liveStatus,
-    );
-
-    if (liveFound) {
-      setIsLive(true);
-    } else if (currentIdx + 1 < stopIds.length) {
-      setCurrentIdx((idx) => idx + 1);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [externalData]);
 
   return (
     <li className="p-2 rounded border border-muted bg-muted/50 flex flex-col relative">
