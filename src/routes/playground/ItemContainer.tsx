@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import BusCard from '~/components/BusCard';
 import { useSearchRoutesQuery } from '~/hooks/useSearchRoutesQuery';
 import { useSearchStore } from '~/stores/searchStore';
 
@@ -25,30 +26,7 @@ export function ItemContainer() {
         </div>
       )}
 
-      {routes?.map((route) => (
-        <div
-          key={route.id}
-          className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
-        >
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-800">
-              {route.shortName || 'N/A'}
-            </h3>
-            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-              {route.longName || 'No description'}
-            </span>
-          </div>
-          <div className="mt-2">
-            <p className="text-sm text-gray-600">Route ID: {route.id}</p>
-          </div>
-        </div>
-      ))}
-
-      {!isLoading && debouncedSearchTerm && routes?.length === 0 && (
-        <div className="col-span-full text-center">
-          <p className="text-gray-500">No routes found</p>
-        </div>
-      )}
+      {routes?.map((route) => <BusCard key={route.id} route={route} />)}
     </div>
   );
 }

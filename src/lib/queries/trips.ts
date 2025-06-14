@@ -12,7 +12,7 @@ export const tripByIdQuery = (tripId: string) => ({
 export const tripsByRouteQuery = (routeId: string) => ({
   queryKey: ['trips', routeId],
   queryFn: (): Promise<Trip[]> =>
-    apiFetch(`/api/v1/trips-by-route.${routeId}`, undefined, {
+    apiFetch(`/api/route/${routeId}/trips`, undefined, {
       responseSchema: TripSelectZodSchema.array(),
     }),
 });

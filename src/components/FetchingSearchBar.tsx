@@ -23,22 +23,6 @@ export function FetchingSearchBar() {
         onChange={(e) => setSearchTerm('routes', e.target.value)}
         placeholder="Search..."
       />
-      {debouncedSearchTerm && (
-        <p className="mt-2 text-sm text-gray-500">
-          Searching for: {debouncedSearchTerm}
-        </p>
-      )}
-      {isLoading && <p className="mt-2 text-sm text-gray-500">Loading...</p>}
-      {routes && (
-        <div className="mt-2">
-          <p className="text-sm text-gray-500">Found {routes.length} routes:</p>
-          <ul className="list-disc pl-5">
-            {routes.map((route) => (
-              <li key={route.id}>{route.shortName || route.longName}</li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }
