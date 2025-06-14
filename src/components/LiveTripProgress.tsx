@@ -162,7 +162,7 @@ export const LiveTripProgress = ({
               <span
                 className={`absolute left-1.5 top-0 w-4 h-4 rounded-full ${getDotClasses(realIdx)}`}
               />
-              <div className="ml-8 pr-2 overflow-hidden w-full">
+              <div className="ml-8 pr-2 overflow-hidden">
                 <span className="font-medium leading-tight block truncate">
                   {stop.stopName}
                 </span>
@@ -172,7 +172,7 @@ export const LiveTripProgress = ({
                   {stop.time} {realIdx === currentIndex && '(Now)'}
                 </span>
                 <span
-                  className={`text-xs ${isDelayedStop ? 'text-red-500' : 'text-muted-foreground'} block truncate whitespace-nowrap`}
+                  className={`text-xs ${isDelayedStop ? 'text-red-500' : 'text-muted-foreground'} block truncate`}
                 >
                   {computeDelta(stop, nowSeconds, formatDelta)}
                 </span>
