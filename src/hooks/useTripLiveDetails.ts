@@ -30,16 +30,23 @@ export const useTripLiveDetails = (
   // Derive some helpful computed values from the raw data
   const derived = useMemo(() => {
     const data = queryResult.data;
-    if (!data) return { currentStop: null, nextStop: null } as const;
+    if (!data)
+      return {
+        currentStop: null,
+        nextStop: null,
+        currentStopId: null,
+      } as const;
 
     // The current stop is the **last** stop with status "Departed"
     const currentStop =
       [...data.stops].reverse().find((s) => s.status === 'Departed') ?? null;
 
+    const currentStopId = currentStop?.stopNumber ?? null;
+
     // The next stop is the first stop that hasn't departed yet
     const nextStop = data.stops.find((s) => s.status !== 'Departed') ?? null;
 
-    return { currentStop, nextStop } as const;
+    return { currentStop, nextStop, currentStopId } as const;
   }, [queryResult.data]);
 
   return {
