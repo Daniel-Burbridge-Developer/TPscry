@@ -16,6 +16,7 @@ import { Route as PlaygroundSearchingRouteImport } from './routes/playground/sea
 import { Route as PlaygroundItemContainerRouteImport } from './routes/playground/ItemContainer'
 import { Route as PlaygroundContainersSearchitemsRouteImport } from './routes/playground/containers/searchitems'
 import { ServerRoute as ApiStopStopIdExternalStopDataServerRouteImport } from './routes/api/stop.$stopId.externalStopData'
+import { ServerRoute as ApiFleetFleetIdExternalLiveTrackServerRouteImport } from './routes/api/fleet.$fleetId.externalLiveTrack'
 import { ServerRoute as ApiRouteRouteIdTripsServerRouteImport } from './routes/api/route.$routeId.trips'
 import { ServerRoute as ApiFuzzyRouteSearchSlugServerRouteImport } from './routes/api/fuzzy.route.$searchSlug'
 
@@ -46,6 +47,12 @@ const ApiStopStopIdExternalStopDataServerRoute =
   ApiStopStopIdExternalStopDataServerRouteImport.update({
     id: '/api/stop/$stopId/externalStopData',
     path: '/api/stop/$stopId/externalStopData',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ApiFleetFleetIdExternalLiveTrackServerRoute =
+  ApiFleetFleetIdExternalLiveTrackServerRouteImport.update({
+    id: '/api/fleet/$fleetId/externalLiveTrack',
+    path: '/api/fleet/$fleetId/externalLiveTrack',
     getParentRoute: () => rootServerRouteImport,
   } as any)
 const ApiRouteRouteIdTripsServerRoute =
@@ -110,17 +117,20 @@ export interface RootRouteChildren {
 export interface FileServerRoutesByFullPath {
   '/api/fuzzy/route/$searchSlug': typeof ApiFuzzyRouteSearchSlugServerRoute
   '/api/route/$routeId/trips': typeof ApiRouteRouteIdTripsServerRoute
+  '/api/fleet/$fleetId/externalLiveTrack': typeof ApiFleetFleetIdExternalLiveTrackServerRoute
   '/api/stop/$stopId/externalStopData': typeof ApiStopStopIdExternalStopDataServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/fuzzy/route/$searchSlug': typeof ApiFuzzyRouteSearchSlugServerRoute
   '/api/route/$routeId/trips': typeof ApiRouteRouteIdTripsServerRoute
+  '/api/fleet/$fleetId/externalLiveTrack': typeof ApiFleetFleetIdExternalLiveTrackServerRoute
   '/api/stop/$stopId/externalStopData': typeof ApiStopStopIdExternalStopDataServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/fuzzy/route/$searchSlug': typeof ApiFuzzyRouteSearchSlugServerRoute
   '/api/route/$routeId/trips': typeof ApiRouteRouteIdTripsServerRoute
+  '/api/fleet/$fleetId/externalLiveTrack': typeof ApiFleetFleetIdExternalLiveTrackServerRoute
   '/api/stop/$stopId/externalStopData': typeof ApiStopStopIdExternalStopDataServerRoute
 }
 export interface FileServerRouteTypes {
@@ -128,22 +138,26 @@ export interface FileServerRouteTypes {
   fullPaths:
     | '/api/fuzzy/route/$searchSlug'
     | '/api/route/$routeId/trips'
+    | '/api/fleet/$fleetId/externalLiveTrack'
     | '/api/stop/$stopId/externalStopData'
   fileServerRoutesByTo: FileServerRoutesByTo
   to:
     | '/api/fuzzy/route/$searchSlug'
     | '/api/route/$routeId/trips'
+    | '/api/fleet/$fleetId/externalLiveTrack'
     | '/api/stop/$stopId/externalStopData'
   id:
     | '__root__'
     | '/api/fuzzy/route/$searchSlug'
     | '/api/route/$routeId/trips'
+    | '/api/fleet/$fleetId/externalLiveTrack'
     | '/api/stop/$stopId/externalStopData'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
   ApiFuzzyRouteSearchSlugServerRoute: typeof ApiFuzzyRouteSearchSlugServerRoute
   ApiRouteRouteIdTripsServerRoute: typeof ApiRouteRouteIdTripsServerRoute
+  ApiFleetFleetIdExternalLiveTrackServerRoute: typeof ApiFleetFleetIdExternalLiveTrackServerRoute
   ApiStopStopIdExternalStopDataServerRoute: typeof ApiStopStopIdExternalStopDataServerRoute
 }
 
@@ -188,6 +202,13 @@ declare module '@tanstack/react-start/server' {
       preLoaderRoute: typeof ApiStopStopIdExternalStopDataServerRouteImport
       parentRoute: typeof rootServerRouteImport
     }
+    '/api/fleet/$fleetId/externalLiveTrack': {
+      id: '/api/fleet/$fleetId/externalLiveTrack'
+      path: '/api/fleet/$fleetId/externalLiveTrack'
+      fullPath: '/api/fleet/$fleetId/externalLiveTrack'
+      preLoaderRoute: typeof ApiFleetFleetIdExternalLiveTrackServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
     '/api/route/$routeId/trips': {
       id: '/api/route/$routeId/trips'
       path: '/api/route/$routeId/trips'
@@ -217,6 +238,8 @@ export const routeTree = rootRouteImport
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiFuzzyRouteSearchSlugServerRoute: ApiFuzzyRouteSearchSlugServerRoute,
   ApiRouteRouteIdTripsServerRoute: ApiRouteRouteIdTripsServerRoute,
+  ApiFleetFleetIdExternalLiveTrackServerRoute:
+    ApiFleetFleetIdExternalLiveTrackServerRoute,
   ApiStopStopIdExternalStopDataServerRoute:
     ApiStopStopIdExternalStopDataServerRoute,
 }

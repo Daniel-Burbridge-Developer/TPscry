@@ -1,5 +1,5 @@
 {
-  "include": ["**/*.ts", "**/*.tsx", "src/routes/api/route.$routeId.trips"],
+  "include": ["**/*.ts", "**/*.tsx", "src/routes/api/route.$routeId.trips", "src/routes/api/fleet.$fleetId.ts.externalLiveTrack"],
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,
