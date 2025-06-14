@@ -12,11 +12,13 @@ const BusCard = ({ route }: BusCardProps) => {
     enabled: Boolean(route.id),
   });
 
+  const routeName = route.shortName || route.longName || 'Unknown Route';
+
   return (
     <Card className="hover:shadow-lg transition-shadow cursor-pointer">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>{route.shortName || route.longName}</span>
+          <span>{routeName}</span>
           <span className="text-xs text-muted-foreground ml-2">{route.id}</span>
         </CardTitle>
       </CardHeader>
@@ -24,7 +26,7 @@ const BusCard = ({ route }: BusCardProps) => {
         {trips && trips.length > 0 ? (
           <ul className="space-y-2">
             {trips.map((trip) => (
-              <TripCard key={trip.id} trip={trip} />
+              <TripCard key={trip.id} trip={trip} routeName={routeName} />
             ))}
           </ul>
         ) : (
