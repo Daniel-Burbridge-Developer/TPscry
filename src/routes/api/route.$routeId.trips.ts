@@ -44,7 +44,7 @@ export const ServerRoute = createServerFileRoute(
           id, route_id, service_id, direction_id, trip_headsign, shape_id, stops
         FROM trips
         WHERE route_id = ${params.routeId}
-        ORDER BY trip_headsign, id
+        ORDER BY trip_headsign, COALESCE(jsonb_array_length(stops), 0) DESC, id
       `);
 
       const routeTrips = result.rows;

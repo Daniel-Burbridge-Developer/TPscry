@@ -25,7 +25,7 @@ export const useTripLiveStatus = (
   const queryClient = useQueryClient();
 
   const queryResult = useQuery<{ isLive: boolean; fleetId: string | null }>({
-    queryKey: ['trip-live-status', trip.id, routeName],
+    queryKey: ['trip-live-status', trip.id, routeName, trip.tripHeadsign],
     queryFn: async () => {
       for (const stopId of stopIds) {
         if (!stopId) continue;
@@ -34,9 +34,13 @@ export const useTripLiveStatus = (
 
         const data = await queryClient.fetchQuery({ queryKey, queryFn });
 
-        const liveRecord = (data as ExternalStopData[]).find(
-          (entry) => entry.busNumber === routeName && entry.liveStatus,
-        );
+        const liveRecord = (data as ExternalStopData[]).find((entry) => {
+          return (
+            entry.busNumber === routeName &&
+            entry.destination === trip.tripHeadsign &&
+            entry.liveStatus
+          );
+        });
 
         if (liveRecord) {
           return { isLive: true, fleetId: liveRecord.fleetId ?? null };
