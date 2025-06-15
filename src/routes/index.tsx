@@ -1,5 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronDown, Clock, Heart, RouteIcon, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Heart,
+  RouteIcon,
+  Search,
+} from "lucide-react";
 import { RouteAndStopSearchBar } from "~/components/search/RouteAndStopSearchBar";
 import {
   Collapsible,
@@ -13,9 +20,13 @@ import BusCard from "~/components/BusCard";
 import StopCard from "~/components/StopCard";
 import type { Stop } from "~/schemas/stopSchema";
 
-import { Card, CardContent } from "~/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import * as React from "react";
 import { cn } from "~/lib/utils";
+import { useRouteStore } from "~/stores/routeStore";
+import { routeByIdQuery } from "~/lib/queries/routes";
+import { useQueries } from "@tanstack/react-query";
+import { Route as RouteType } from "~/schemas/routeSchema";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -177,14 +188,49 @@ const RecentSearches = () => {
 };
 
 const Favouites = () => {
+  // Get favourite route IDs from the store
+  const favouriteRouteIds = useRouteStore((state) => state.favouriteRouteIds);
+
+  // Fetch details for each favourite route in parallel
+  const routeQueries = useQueries({
+    queries: favouriteRouteIds.map((id) => ({
+      ...routeByIdQuery(id),
+      enabled: favouriteRouteIds.length > 0,
+    })),
+  });
+
+  const isLoading = routeQueries.some((q) => q.isLoading);
+  const favorites = routeQueries
+    .map((q) => q.data)
+    .filter((r): r is RouteType => Boolean(r));
   return (
     <BackdropCard className="w-full" contentClassName="p-0">
-      <div className="flex w-full flex-col items-center">
-        <h1 className="flex items-center justify-center gap-2">
-          <Heart className="h-6 w-6" />
-          Favourites
-        </h1>
-      </div>
+      <Card className="shadow-lg">
+        <CardHeader className="pb-3 sm:pb-6">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
+            Favorites
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="space-y-1 sm:space-y-2">
+            {favorites.map((favorite, index) => (
+              <div
+                key={index}
+                className="flex cursor-pointer items-center justify-between rounded-lg p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 sm:p-3"
+              >
+                <span className="text-sm">
+                  {favorite.longName || favorite.shortName}
+                </span>
+                <div className="flex items-center gap-2">
+                  <Heart className="h-4 w-4 fill-current text-red-500" />
+                  <ChevronRight className="h-4 w-4 text-gray-400" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </BackdropCard>
   );
 };
