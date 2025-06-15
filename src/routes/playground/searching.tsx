@@ -10,6 +10,8 @@ function RouteComponent() {
   return (
     <div>
       <Link to="/playground/containers/searchitems">Search Items</Link>
+      {' -- '}
+      <Link to="/playground/favorites">Favorites</Link>
       <FetchingSearchBar />
       <ItemContainer />
     </div>

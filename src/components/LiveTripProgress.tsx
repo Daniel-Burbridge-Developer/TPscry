@@ -49,7 +49,7 @@ const computeDelta = (
 
   if (Math.abs(diff) < 60) {
     // If the stop is delayed, show 'Delayed'
-    if (stop.status === 'Predicted' && diff < 0) return 'Delayed';
+    if (stop.status === 'Predicted') return 'Delayed';
     if (diff < 0 && stop.status === 'Departed') return 'Departed just now';
     if (diff >= 0) return 'Arriving soon';
     // diff < 0 but not departed -> show generic ago
@@ -156,23 +156,23 @@ export const LiveTripProgress = ({
           return (
             <div
               key={stop.stopNumber}
-              className="relative mb-8 last:mb-0 overflow-hidden"
+              className="relative mb-8 last:mb-0"
               style={{ minHeight: '2.5rem' }}
             >
               <span
                 className={`absolute left-1.5 top-0 w-4 h-4 rounded-full ${getDotClasses(realIdx)}`}
               />
-              <div className="ml-8 pr-2 overflow-hidden">
-                <span className="font-medium leading-tight block truncate">
+              <div className="ml-8">
+                <span className="font-medium leading-tight block">
                   {stop.stopName}
                 </span>
                 <span
-                  className={`text-xs block truncate ${isDelayedStop ? 'text-red-500' : 'text-muted-foreground'}`}
+                  className={`text-xs block ${isDelayedStop ? 'text-red-500' : 'text-muted-foreground'}`}
                 >
                   {stop.time} {realIdx === currentIndex && '(Now)'}
                 </span>
                 <span
-                  className={`text-xs ${isDelayedStop ? 'text-red-500' : 'text-muted-foreground'} block truncate`}
+                  className={`text-xs ${isDelayedStop ? 'text-red-500' : 'text-muted-foreground'} block`}
                 >
                   {computeDelta(stop, nowSeconds, formatDelta)}
                 </span>

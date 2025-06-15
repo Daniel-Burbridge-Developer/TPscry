@@ -8,3 +8,11 @@ export const searchRoutesQuery = (searchSlug: string) => ({
       responseSchema: routeSchema.array(),
     }),
 });
+
+export const routeByIdQuery = (routeId: string) => ({
+  queryKey: ['route', routeId],
+  queryFn: (): Promise<Route> =>
+    apiFetch(`/api/route/${routeId}`, undefined, {
+      responseSchema: routeSchema,
+    }),
+});
