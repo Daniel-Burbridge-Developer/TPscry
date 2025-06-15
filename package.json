@@ -18,9 +18,9 @@
     "@radix-ui/react-progress": "^1.1.7",
     "@tanstack/react-query": "^5.80.7",
     "@tanstack/react-query-devtools": "^5.80.7",
-    "@tanstack/react-router": "^1.121.2",
-    "@tanstack/react-router-devtools": "^1.121.5",
-    "@tanstack/react-start": "^1.121.4",
+    "@tanstack/react-router": "^1.121.12",
+    "@tanstack/react-router-devtools": "^1.121.12",
+    "@tanstack/react-start": "^1.121.13",
     "@vercel/analytics": "^1.5.0",
     "cheerio": "^1.1.0",
     "class-variance-authority": "^0.7.1",
@@ -33,7 +33,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "vite": "^6.3.5",
-    "zod": "^3.25.63",
+    "zod": "^3.25.64",
     "zustand": "^5.0.5"
   },
   "devDependencies": {
