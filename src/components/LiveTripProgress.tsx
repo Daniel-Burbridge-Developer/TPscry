@@ -4,6 +4,7 @@
 import React from 'react';
 import type { LiveTripStop } from '~/schemas/tripLiveDetailsSchema';
 import { useTripProgress } from '~/hooks/useTripProgress';
+import { Bus, Check } from 'lucide-react';
 
 interface LiveTripProgressProps {
   stops: LiveTripStop[];
@@ -72,25 +73,54 @@ export const LiveTripProgress = ({
     formatDelta,
   } = useTripProgress(stops, { currentStopId });
 
-  // Determine indices for condensed view
-  const startIndex = isShortView ? Math.max(0, currentIndex - 1) : 0;
-  const endIndex = isShortView
-    ? Math.min(stops.length - 1, currentIndex + 1)
-    : stops.length - 1;
-  const displayedStops = stops.slice(startIndex, endIndex + 1);
+  // ---------------------------------------------------------------------------
+  // Determine which stops to show in the condensed view.
+  // We always try to render three stops ( previous | current | next ) but fall
+  // back gracefully when the bus is at the very beginning or end of the route.
+  // ---------------------------------------------------------------------------
+
+  const windowIndices = React.useMemo(() => {
+    if (!isShortView || stops.length <= 3) return stops.map((_, i) => i);
+
+    const total = stops.length;
+    let indices = [currentIndex - 1, currentIndex, currentIndex + 1].filter(
+      (i) => i >= 0 && i < total,
+    );
+
+    // Expand (or prepend / append) so that we always show three indices where
+    // possible. This handles edge-cases at the start/end of the trip.
+    while (indices.length < 3) {
+      if (indices[0] > 0) {
+        indices.unshift(indices[0] - 1);
+      } else if (indices[indices.length - 1] < total - 1) {
+        indices.push(indices[indices.length - 1] + 1);
+      } else {
+        break;
+      }
+    }
+    return indices;
+  }, [isShortView, currentIndex, stops]);
+
+  const startIndex = windowIndices[0];
+  const endIndex = windowIndices[windowIndices.length - 1];
+  const displayedStops = windowIndices.map((i) => stops[i]);
 
   // Progress within displayed window
   const localProgress = React.useMemo(() => {
     if (!isShortView || displayedStops.length < 2) return overallProgress;
-    const segs = displayedStops.length - 1;
-    let completed = 0;
-    const activeLocal =
-      currentIndex >= startIndex && currentIndex < endIndex
-        ? currentIndex - startIndex
-        : -1;
-    completed += Math.max(0, activeLocal);
-    if (activeLocal !== -1) completed += getSegmentProgress(currentIndex);
-    return completed / segs;
+
+    const segs = displayedStops.length - 1; // number of segments being shown
+
+    // Count how many of those segments have been fully completed.
+    const completedSegments = windowIndices.filter(
+      (i) => i < currentIndex,
+    ).length;
+
+    let progress = completedSegments;
+    if (windowIndices.includes(currentIndex)) {
+      progress += getSegmentProgress(currentIndex);
+    }
+    return progress / segs;
   }, [
     isShortView,
     displayedStops.length,
@@ -99,6 +129,7 @@ export const LiveTripProgress = ({
     currentIndex,
     getSegmentProgress,
     overallProgress,
+    windowIndices,
   ]);
 
   const progressRatio = isShortView ? localProgress : overallProgress;
@@ -132,6 +163,11 @@ export const LiveTripProgress = ({
           className="absolute left-3 top-0 w-1 bg-green-500 rounded transition-all duration-500 ease-out"
           style={{ height: `${progressRatio * 100}%` }}
         />
+        {/* Moving bus icon */}
+        <Bus
+          className="absolute -left-2.5 w-6 h-6 text-primary z-10 transition-all duration-500 ease-out"
+          style={{ top: `calc(${progressRatio * 100}% - 12px)` }}
+        />
         {/* Delayed portion overlay (red) */}
         {segments.map((seg, i) => {
           if (!seg.delayed) return null;
@@ -160,8 +196,12 @@ export const LiveTripProgress = ({
               style={{ minHeight: '2.5rem' }}
             >
               <span
-                className={`absolute left-1.5 top-0 w-4 h-4 rounded-full ${getDotClasses(realIdx)}`}
-              />
+                className={`absolute left-1.5 top-0 w-4 h-4 rounded-full flex items-center justify-center ${getDotClasses(realIdx)}`}
+              >
+                {realIdx < currentIndex && (
+                  <Check className="w-3 h-3 text-white" />
+                )}
+              </span>
               <div className="ml-8">
                 <span className="font-medium leading-tight block">
                   {stop.stopName}
