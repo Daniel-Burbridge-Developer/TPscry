@@ -8,35 +8,195 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createServerRootRoute } from '@tanstack/react-start/server'
+
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlaygroundSearchingRouteImport } from './routes/playground/searching'
+import { Route as PlaygroundFavoritesRouteImport } from './routes/playground/favorites'
+import { Route as PlaygroundFavContainerRouteImport } from './routes/playground/favContainer'
+import { Route as PlaygroundItemContainerRouteImport } from './routes/playground/ItemContainer'
+import { Route as PlaygroundContainersSearchitemsRouteImport } from './routes/playground/containers/searchitems'
+import { ServerRoute as ApiRouteRouteIdServerRouteImport } from './routes/api/route.$routeId'
+import { ServerRoute as ApiStopStopIdExternalStopDataServerRouteImport } from './routes/api/stop.$stopId.externalStopData'
+import { ServerRoute as ApiFleetFleetIdExternalLiveTrackServerRouteImport } from './routes/api/fleet.$fleetId.externalLiveTrack'
+import { ServerRoute as ApiRouteRouteIdTripsServerRouteImport } from './routes/api/route.$routeId.trips'
+import { ServerRoute as ApiFuzzyRouteSearchSlugServerRouteImport } from './routes/api/fuzzy.route.$searchSlug'
+
+const rootServerRouteImport = createServerRootRoute()
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaygroundSearchingRoute = PlaygroundSearchingRouteImport.update({
+  id: '/playground/searching',
+  path: '/playground/searching',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundFavoritesRoute = PlaygroundFavoritesRouteImport.update({
+  id: '/playground/favorites',
+  path: '/playground/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundFavContainerRoute = PlaygroundFavContainerRouteImport.update({
+  id: '/playground/favContainer',
+  path: '/playground/favContainer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundItemContainerRoute = PlaygroundItemContainerRouteImport.update({
+  id: '/playground/ItemContainer',
+  path: '/playground/ItemContainer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundContainersSearchitemsRoute =
+  PlaygroundContainersSearchitemsRouteImport.update({
+    id: '/playground/containers/searchitems',
+    path: '/playground/containers/searchitems',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiRouteRouteIdServerRoute = ApiRouteRouteIdServerRouteImport.update({
+  id: '/api/route/$routeId',
+  path: '/api/route/$routeId',
+  getParentRoute: () => rootServerRouteImport,
+} as any)
+const ApiStopStopIdExternalStopDataServerRoute =
+  ApiStopStopIdExternalStopDataServerRouteImport.update({
+    id: '/api/stop/$stopId/externalStopData',
+    path: '/api/stop/$stopId/externalStopData',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ApiFleetFleetIdExternalLiveTrackServerRoute =
+  ApiFleetFleetIdExternalLiveTrackServerRouteImport.update({
+    id: '/api/fleet/$fleetId/externalLiveTrack',
+    path: '/api/fleet/$fleetId/externalLiveTrack',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
+const ApiRouteRouteIdTripsServerRoute =
+  ApiRouteRouteIdTripsServerRouteImport.update({
+    id: '/trips',
+    path: '/trips',
+    getParentRoute: () => ApiRouteRouteIdServerRoute,
+  } as any)
+const ApiFuzzyRouteSearchSlugServerRoute =
+  ApiFuzzyRouteSearchSlugServerRouteImport.update({
+    id: '/api/fuzzy/route/$searchSlug',
+    path: '/api/fuzzy/route/$searchSlug',
+    getParentRoute: () => rootServerRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/playground/ItemContainer': typeof PlaygroundItemContainerRoute
+  '/playground/favContainer': typeof PlaygroundFavContainerRoute
+  '/playground/favorites': typeof PlaygroundFavoritesRoute
+  '/playground/searching': typeof PlaygroundSearchingRoute
+  '/playground/containers/searchitems': typeof PlaygroundContainersSearchitemsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/playground/ItemContainer': typeof PlaygroundItemContainerRoute
+  '/playground/favContainer': typeof PlaygroundFavContainerRoute
+  '/playground/favorites': typeof PlaygroundFavoritesRoute
+  '/playground/searching': typeof PlaygroundSearchingRoute
+  '/playground/containers/searchitems': typeof PlaygroundContainersSearchitemsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/playground/ItemContainer': typeof PlaygroundItemContainerRoute
+  '/playground/favContainer': typeof PlaygroundFavContainerRoute
+  '/playground/favorites': typeof PlaygroundFavoritesRoute
+  '/playground/searching': typeof PlaygroundSearchingRoute
+  '/playground/containers/searchitems': typeof PlaygroundContainersSearchitemsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/playground/ItemContainer'
+    | '/playground/favContainer'
+    | '/playground/favorites'
+    | '/playground/searching'
+    | '/playground/containers/searchitems'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/playground/ItemContainer'
+    | '/playground/favContainer'
+    | '/playground/favorites'
+    | '/playground/searching'
+    | '/playground/containers/searchitems'
+  id:
+    | '__root__'
+    | '/'
+    | '/playground/ItemContainer'
+    | '/playground/favContainer'
+    | '/playground/favorites'
+    | '/playground/searching'
+    | '/playground/containers/searchitems'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PlaygroundItemContainerRoute: typeof PlaygroundItemContainerRoute
+  PlaygroundFavContainerRoute: typeof PlaygroundFavContainerRoute
+  PlaygroundFavoritesRoute: typeof PlaygroundFavoritesRoute
+  PlaygroundSearchingRoute: typeof PlaygroundSearchingRoute
+  PlaygroundContainersSearchitemsRoute: typeof PlaygroundContainersSearchitemsRoute
+}
+export interface FileServerRoutesByFullPath {
+  '/api/route/$routeId': typeof ApiRouteRouteIdServerRouteWithChildren
+  '/api/fuzzy/route/$searchSlug': typeof ApiFuzzyRouteSearchSlugServerRoute
+  '/api/route/$routeId/trips': typeof ApiRouteRouteIdTripsServerRoute
+  '/api/fleet/$fleetId/externalLiveTrack': typeof ApiFleetFleetIdExternalLiveTrackServerRoute
+  '/api/stop/$stopId/externalStopData': typeof ApiStopStopIdExternalStopDataServerRoute
+}
+export interface FileServerRoutesByTo {
+  '/api/route/$routeId': typeof ApiRouteRouteIdServerRouteWithChildren
+  '/api/fuzzy/route/$searchSlug': typeof ApiFuzzyRouteSearchSlugServerRoute
+  '/api/route/$routeId/trips': typeof ApiRouteRouteIdTripsServerRoute
+  '/api/fleet/$fleetId/externalLiveTrack': typeof ApiFleetFleetIdExternalLiveTrackServerRoute
+  '/api/stop/$stopId/externalStopData': typeof ApiStopStopIdExternalStopDataServerRoute
+}
+export interface FileServerRoutesById {
+  __root__: typeof rootServerRouteImport
+  '/api/route/$routeId': typeof ApiRouteRouteIdServerRouteWithChildren
+  '/api/fuzzy/route/$searchSlug': typeof ApiFuzzyRouteSearchSlugServerRoute
+  '/api/route/$routeId/trips': typeof ApiRouteRouteIdTripsServerRoute
+  '/api/fleet/$fleetId/externalLiveTrack': typeof ApiFleetFleetIdExternalLiveTrackServerRoute
+  '/api/stop/$stopId/externalStopData': typeof ApiStopStopIdExternalStopDataServerRoute
+}
+export interface FileServerRouteTypes {
+  fileServerRoutesByFullPath: FileServerRoutesByFullPath
+  fullPaths:
+    | '/api/route/$routeId'
+    | '/api/fuzzy/route/$searchSlug'
+    | '/api/route/$routeId/trips'
+    | '/api/fleet/$fleetId/externalLiveTrack'
+    | '/api/stop/$stopId/externalStopData'
+  fileServerRoutesByTo: FileServerRoutesByTo
+  to:
+    | '/api/route/$routeId'
+    | '/api/fuzzy/route/$searchSlug'
+    | '/api/route/$routeId/trips'
+    | '/api/fleet/$fleetId/externalLiveTrack'
+    | '/api/stop/$stopId/externalStopData'
+  id:
+    | '__root__'
+    | '/api/route/$routeId'
+    | '/api/fuzzy/route/$searchSlug'
+    | '/api/route/$routeId/trips'
+    | '/api/fleet/$fleetId/externalLiveTrack'
+    | '/api/stop/$stopId/externalStopData'
+  fileServerRoutesById: FileServerRoutesById
+}
+export interface RootServerRouteChildren {
+  ApiRouteRouteIdServerRoute: typeof ApiRouteRouteIdServerRouteWithChildren
+  ApiFuzzyRouteSearchSlugServerRoute: typeof ApiFuzzyRouteSearchSlugServerRoute
+  ApiFleetFleetIdExternalLiveTrackServerRoute: typeof ApiFleetFleetIdExternalLiveTrackServerRoute
+  ApiStopStopIdExternalStopDataServerRoute: typeof ApiStopStopIdExternalStopDataServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,12 +208,115 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playground/searching': {
+      id: '/playground/searching'
+      path: '/playground/searching'
+      fullPath: '/playground/searching'
+      preLoaderRoute: typeof PlaygroundSearchingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/favorites': {
+      id: '/playground/favorites'
+      path: '/playground/favorites'
+      fullPath: '/playground/favorites'
+      preLoaderRoute: typeof PlaygroundFavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/favContainer': {
+      id: '/playground/favContainer'
+      path: '/playground/favContainer'
+      fullPath: '/playground/favContainer'
+      preLoaderRoute: typeof PlaygroundFavContainerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/ItemContainer': {
+      id: '/playground/ItemContainer'
+      path: '/playground/ItemContainer'
+      fullPath: '/playground/ItemContainer'
+      preLoaderRoute: typeof PlaygroundItemContainerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/containers/searchitems': {
+      id: '/playground/containers/searchitems'
+      path: '/playground/containers/searchitems'
+      fullPath: '/playground/containers/searchitems'
+      preLoaderRoute: typeof PlaygroundContainersSearchitemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
+}
+declare module '@tanstack/react-start/server' {
+  interface ServerFileRoutesByPath {
+    '/api/route/$routeId': {
+      id: '/api/route/$routeId'
+      path: '/api/route/$routeId'
+      fullPath: '/api/route/$routeId'
+      preLoaderRoute: typeof ApiRouteRouteIdServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/stop/$stopId/externalStopData': {
+      id: '/api/stop/$stopId/externalStopData'
+      path: '/api/stop/$stopId/externalStopData'
+      fullPath: '/api/stop/$stopId/externalStopData'
+      preLoaderRoute: typeof ApiStopStopIdExternalStopDataServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/fleet/$fleetId/externalLiveTrack': {
+      id: '/api/fleet/$fleetId/externalLiveTrack'
+      path: '/api/fleet/$fleetId/externalLiveTrack'
+      fullPath: '/api/fleet/$fleetId/externalLiveTrack'
+      preLoaderRoute: typeof ApiFleetFleetIdExternalLiveTrackServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
+    '/api/route/$routeId/trips': {
+      id: '/api/route/$routeId/trips'
+      path: '/trips'
+      fullPath: '/api/route/$routeId/trips'
+      preLoaderRoute: typeof ApiRouteRouteIdTripsServerRouteImport
+      parentRoute: typeof ApiRouteRouteIdServerRoute
+    }
+    '/api/fuzzy/route/$searchSlug': {
+      id: '/api/fuzzy/route/$searchSlug'
+      path: '/api/fuzzy/route/$searchSlug'
+      fullPath: '/api/fuzzy/route/$searchSlug'
+      preLoaderRoute: typeof ApiFuzzyRouteSearchSlugServerRouteImport
+      parentRoute: typeof rootServerRouteImport
+    }
   }
 }
 
+interface ApiRouteRouteIdServerRouteChildren {
+  ApiRouteRouteIdTripsServerRoute: typeof ApiRouteRouteIdTripsServerRoute
+}
+
+const ApiRouteRouteIdServerRouteChildren: ApiRouteRouteIdServerRouteChildren = {
+  ApiRouteRouteIdTripsServerRoute: ApiRouteRouteIdTripsServerRoute,
+}
+
+const ApiRouteRouteIdServerRouteWithChildren =
+  ApiRouteRouteIdServerRoute._addFileChildren(
+    ApiRouteRouteIdServerRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PlaygroundItemContainerRoute: PlaygroundItemContainerRoute,
+  PlaygroundFavContainerRoute: PlaygroundFavContainerRoute,
+  PlaygroundFavoritesRoute: PlaygroundFavoritesRoute,
+  PlaygroundSearchingRoute: PlaygroundSearchingRoute,
+  PlaygroundContainersSearchitemsRoute: PlaygroundContainersSearchitemsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+const rootServerRouteChildren: RootServerRouteChildren = {
+  ApiRouteRouteIdServerRoute: ApiRouteRouteIdServerRouteWithChildren,
+  ApiFuzzyRouteSearchSlugServerRoute: ApiFuzzyRouteSearchSlugServerRoute,
+  ApiFleetFleetIdExternalLiveTrackServerRoute:
+    ApiFleetFleetIdExternalLiveTrackServerRoute,
+  ApiStopStopIdExternalStopDataServerRoute:
+    ApiStopStopIdExternalStopDataServerRoute,
+}
+export const serverRouteTree = rootServerRouteImport
+  ._addFileChildren(rootServerRouteChildren)
+  ._addFileTypes<FileServerRouteTypes>()
