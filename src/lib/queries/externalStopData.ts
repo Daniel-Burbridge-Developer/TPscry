@@ -1,9 +1,9 @@
-import { apiFetch } from '~/lib/apiClient';
-import { ExternalStopDataSchema } from '~/schemas';
+import { apiFetch } from "~/lib/apiClient";
+import { ExternalStopDataSchema } from "~/schemas";
 
 export const getExternalStopDataQuery = (stopId: string) => {
   return {
-    queryKey: ['external-stop-data', stopId],
+    queryKey: ["external-stop-data", stopId],
     queryFn: () =>
       apiFetch(`/api/stop/${stopId}/externalStopData`, undefined, {
         responseSchema: ExternalStopDataSchema.array(),

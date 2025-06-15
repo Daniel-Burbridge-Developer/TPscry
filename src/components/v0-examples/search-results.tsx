@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { Route, MapPin, ChevronUp, ChevronDown } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Route, MapPin, ChevronUp, ChevronDown } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import { BusRouteItem } from './bus-route-item';
-import { BusStopItem } from './bus-stop-item';
+} from "@/components/ui/collapsible";
+import { BusRouteItem } from "./bus-route-item";
+import { BusStopItem } from "./bus-stop-item";
 
 // TODO: Replace with your Zod schema types
 interface SearchResults {
@@ -57,7 +57,7 @@ export function SearchResults({
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 mb-4 sm:mb-6">
+    <div className="mb-4 space-y-4 sm:mb-6 sm:space-y-6">
       {/* Bus Routes Group */}
       {searchResults.buses.length > 0 && (
         <Collapsible
@@ -66,22 +66,22 @@ export function SearchResults({
         >
           <Card className="shadow-lg">
             <CollapsibleTrigger asChild>
-              <CardHeader className="pb-3 sm:pb-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <CardHeader className="cursor-pointer pb-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 sm:pb-6">
                 <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
                   <div className="flex items-center gap-2">
-                    <Route className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <Route className="h-4 w-4 sm:h-5 sm:w-5" />
                     Bus Routes ({searchResults.buses.length})
                   </div>
                   {busRoutesExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-gray-500" />
+                    <ChevronUp className="h-5 w-5 text-gray-500" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                    <ChevronDown className="h-5 w-5 text-gray-500" />
                   )}
                 </CardTitle>
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="space-y-3 sm:space-y-4 pt-0">
+              <CardContent className="space-y-3 pt-0 sm:space-y-4">
                 {searchResults.buses.map((bus) => (
                   <BusRouteItem
                     key={bus.id}
@@ -105,22 +105,22 @@ export function SearchResults({
         >
           <Card className="shadow-lg">
             <CollapsibleTrigger asChild>
-              <CardHeader className="pb-3 sm:pb-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <CardHeader className="cursor-pointer pb-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 sm:pb-6">
                 <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <MapPin className="h-4 w-4 sm:h-5 sm:w-5" />
                     Bus Stops ({searchResults.stops.length})
                   </div>
                   {busStopsExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-gray-500" />
+                    <ChevronUp className="h-5 w-5 text-gray-500" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-500" />
+                    <ChevronDown className="h-5 w-5 text-gray-500" />
                   )}
                 </CardTitle>
               </CardHeader>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <CardContent className="space-y-3 sm:space-y-4 pt-0">
+              <CardContent className="space-y-3 pt-0 sm:space-y-4">
                 {searchResults.stops.map((stop) => (
                   <BusStopItem
                     key={stop.id}

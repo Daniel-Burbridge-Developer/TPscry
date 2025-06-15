@@ -23,5 +23,5 @@ export const trips = pgTable(
     index("route_id_idx").on(trips.routeId),
     index("route_service_idx").on(trips.routeId, trips.serviceId),
     index("shape_id_idx").on(trips.shapeId),
-  ]
+  ],
 );

@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { searchStopsQuery } from '~/lib/queries/stops';
+import { useQuery } from "@tanstack/react-query";
+import { searchStopsQuery } from "~/lib/queries/stops";
 
 export const useSearchStopsQuery = (
   searchSlug: string,

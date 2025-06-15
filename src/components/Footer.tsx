@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
 const Footer: React.FC = () => (
-  <footer className="w-full py-4 px-6 mt-8 bg-gray-100 text-gray-600 text-sm text-center border-t">
+  <footer className="mt-8 w-full border-t bg-gray-100 px-6 py-4 text-center text-sm text-gray-600">
     <div>
-      <strong>TP Scry</strong> is an independent project and is{' '}
+      <strong>TP Scry</strong> is an independent project and is{" "}
       <span className="font-semibold">
         not affiliated with, endorsed by, or associated with Transperth, the
         Public Transport Authority of Western Australia, or any government

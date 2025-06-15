@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { SearchResultsSchema, type SearchResults } from '../types';
+import { useQuery } from "@tanstack/react-query";
+import { SearchResultsSchema, type SearchResults } from "../types";
 
 /**
  * Search API functions using React Query
@@ -14,7 +14,7 @@ async function searchBusesAndStops(query: string): Promise<SearchResults> {
   const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
 
   if (!response.ok) {
-    throw new Error('Search failed');
+    throw new Error("Search failed");
   }
 
   const data = await response.json();
@@ -26,7 +26,7 @@ async function searchBusesAndStops(query: string): Promise<SearchResults> {
 // React Query hook for search
 export function useSearch(query: string, enabled = true) {
   return useQuery({
-    queryKey: ['search', query],
+    queryKey: ["search", query],
     queryFn: () => searchBusesAndStops(query),
     enabled: enabled && query.length > 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -38,11 +38,11 @@ export function useSearch(query: string, enabled = true) {
 // Real-time route tracking
 export function useRouteTracking(routeId: string, enabled = true) {
   return useQuery({
-    queryKey: ['route-tracking', routeId],
+    queryKey: ["route-tracking", routeId],
     queryFn: async () => {
       // TODO: Replace with your actual API endpoint
       const response = await fetch(`/api/routes/${routeId}/tracking`);
-      if (!response.ok) throw new Error('Failed to fetch route tracking');
+      if (!response.ok) throw new Error("Failed to fetch route tracking");
       return response.json();
     },
     enabled,
@@ -50,8 +50,8 @@ export function useRouteTracking(routeId: string, enabled = true) {
     staleTime: 5000, // Consider data stale after 5 seconds
   });
 }
-import { useQuery } from '@tanstack/react-query';
-import { SearchResultsSchema, type SearchResults } from '../types';
+import { useQuery } from "@tanstack/react-query";
+import { SearchResultsSchema, type SearchResults } from "../types";
 
 /**
  * Search API functions using React Query
@@ -66,7 +66,7 @@ async function searchBusesAndStops(query: string): Promise<SearchResults> {
   const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
 
   if (!response.ok) {
-    throw new Error('Search failed');
+    throw new Error("Search failed");
   }
 
   const data = await response.json();
@@ -78,7 +78,7 @@ async function searchBusesAndStops(query: string): Promise<SearchResults> {
 // React Query hook for search
 export function useSearch(query: string, enabled = true) {
   return useQuery({
-    queryKey: ['search', query],
+    queryKey: ["search", query],
     queryFn: () => searchBusesAndStops(query),
     enabled: enabled && query.length > 0,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -90,11 +90,11 @@ export function useSearch(query: string, enabled = true) {
 // Real-time route tracking
 export function useRouteTracking(routeId: string, enabled = true) {
   return useQuery({
-    queryKey: ['route-tracking', routeId],
+    queryKey: ["route-tracking", routeId],
     queryFn: async () => {
       // TODO: Replace with your actual API endpoint
       const response = await fetch(`/api/routes/${routeId}/tracking`);
-      if (!response.ok) throw new Error('Failed to fetch route tracking');
+      if (!response.ok) throw new Error("Failed to fetch route tracking");
       return response.json();
     },
     enabled,

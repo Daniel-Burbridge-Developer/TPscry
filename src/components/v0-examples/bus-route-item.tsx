@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   ChevronUp,
@@ -6,13 +6,13 @@ import {
   ChevronRight,
   Wifi,
   WifiOff,
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+} from "@/components/ui/collapsible";
 
 // TODO: Replace with your Zod schema types
 interface Route {
@@ -56,63 +56,63 @@ export function BusRouteItem({
 
   return (
     <Collapsible open={isExpanded} onOpenChange={onToggleExpansion}>
-      <div className="border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+      <div className="rounded-lg border transition-colors hover:bg-gray-50 dark:hover:bg-gray-800">
         <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between p-3 sm:p-4 cursor-pointer">
+          <div className="flex cursor-pointer items-center justify-between p-3 sm:p-4">
             <div className="flex items-center gap-3">
-              <h3 className="font-semibold text-base sm:text-lg">{bus.name}</h3>
+              <h3 className="text-base font-semibold sm:text-lg">{bus.name}</h3>
               <Badge variant="outline" className="text-xs">
-                {bus.routes.length} route{bus.routes.length !== 1 ? 's' : ''}
+                {bus.routes.length} route{bus.routes.length !== 1 ? "s" : ""}
               </Badge>
             </div>
             <div className="flex items-center gap-2">
-              <div className="text-right hidden sm:block">
+              <div className="hidden text-right sm:block">
                 <div className="text-sm text-gray-500">
                   {liveRoutesCount} live
                 </div>
               </div>
               {isExpanded ? (
-                <ChevronUp className="w-4 h-4 text-gray-500" />
+                <ChevronUp className="h-4 w-4 text-gray-500" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-gray-500" />
+                <ChevronDown className="h-4 w-4 text-gray-500" />
               )}
             </div>
           </div>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-2">
+          <div className="space-y-2 px-3 pb-3 sm:px-4 sm:pb-4">
             {bus.routes.map((route) => (
               <div
                 key={route.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white dark:bg-gray-900 rounded-lg border cursor-pointer hover:shadow-md transition-shadow gap-2 sm:gap-3"
+                className="flex cursor-pointer flex-col justify-between gap-2 rounded-lg border bg-white p-3 transition-shadow hover:shadow-md dark:bg-gray-900 sm:flex-row sm:items-center sm:gap-3"
                 onClick={() => onRouteSelect(route)}
               >
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
                     {route.isLive ? (
-                      <Wifi className="w-4 h-4 text-green-500" />
+                      <Wifi className="h-4 w-4 text-green-500" />
                     ) : (
-                      <WifiOff className="w-4 h-4 text-gray-400" />
+                      <WifiOff className="h-4 w-4 text-gray-400" />
                     )}
-                    <span className="font-medium text-sm sm:text-base">
+                    <span className="text-sm font-medium sm:text-base">
                       {route.destination}
                     </span>
                   </div>
                   <Badge
-                    variant={route.isLive ? 'default' : 'secondary'}
+                    variant={route.isLive ? "default" : "secondary"}
                     className="text-xs"
                   >
-                    {route.isLive ? 'Live' : 'Offline'}
+                    {route.isLive ? "Live" : "Offline"}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between sm:justify-end gap-3">
+                <div className="flex items-center justify-between gap-3 sm:justify-end">
                   <div className="text-left sm:text-right">
                     <div className="text-sm font-medium">{route.nextStop}</div>
                     <div className="text-xs text-gray-500">
                       ETA: {route.eta}
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-400 hidden sm:block" />
+                  <ChevronRight className="hidden h-4 w-4 text-gray-400 sm:block" />
                 </div>
               </div>
             ))}

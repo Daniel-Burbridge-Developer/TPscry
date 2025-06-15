@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { getTripLiveDetailsQuery } from '~/lib/queries/tripLiveDetails';
-import type { TripLiveDetails } from '~/schemas/tripLiveDetailsSchema';
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getTripLiveDetailsQuery } from "~/lib/queries/tripLiveDetails";
+import type { TripLiveDetails } from "~/schemas/tripLiveDetailsSchema";
 
 interface UseTripLiveDetailsOptions {
   /**
@@ -21,7 +21,7 @@ export const useTripLiveDetails = (
   }: UseTripLiveDetailsOptions = {},
 ) => {
   const queryResult = useQuery<TripLiveDetails>({
-    ...getTripLiveDetailsQuery(fleetNumber ?? ''),
+    ...getTripLiveDetailsQuery(fleetNumber ?? ""),
     enabled: enabled && !!fleetNumber,
     refetchInterval: pollingIntervalMs,
     staleTime: pollingIntervalMs,
@@ -39,12 +39,12 @@ export const useTripLiveDetails = (
 
     // The current stop is the **last** stop with status "Departed"
     const currentStop =
-      [...data.stops].reverse().find((s) => s.status === 'Departed') ?? null;
+      [...data.stops].reverse().find((s) => s.status === "Departed") ?? null;
 
     const currentStopId = currentStop?.stopNumber ?? null;
 
     // The next stop is the first stop that hasn't departed yet
-    const nextStop = data.stops.find((s) => s.status !== 'Departed') ?? null;
+    const nextStop = data.stops.find((s) => s.status !== "Departed") ?? null;
 
     return { currentStop, nextStop, currentStopId } as const;
   }, [queryResult.data]);

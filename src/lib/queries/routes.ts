@@ -1,8 +1,8 @@
-import { apiFetch } from '~/lib/apiClient';
-import { routeSchema, Route } from '~/schemas/routeSchema';
+import { apiFetch } from "~/lib/apiClient";
+import { routeSchema, Route } from "~/schemas/routeSchema";
 
 export const searchRoutesQuery = (searchSlug: string) => ({
-  queryKey: ['routes', 'search', searchSlug],
+  queryKey: ["routes", "search", searchSlug],
   queryFn: (): Promise<Route[]> =>
     apiFetch(`/api/fuzzy/route/${searchSlug}`, undefined, {
       responseSchema: routeSchema.array(),
@@ -10,7 +10,7 @@ export const searchRoutesQuery = (searchSlug: string) => ({
 });
 
 export const routeByIdQuery = (routeId: string) => ({
-  queryKey: ['route', routeId],
+  queryKey: ["route", routeId],
   queryFn: (): Promise<Route> =>
     apiFetch(`/api/route/${routeId}`, undefined, {
       responseSchema: routeSchema,

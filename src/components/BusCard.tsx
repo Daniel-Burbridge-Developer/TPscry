@@ -1,8 +1,8 @@
-import { Route } from '~/schemas/routeSchema';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { useRouteTripsQuery } from '~/hooks/useRouteTripsQuery';
-import TripCard from './TripCard';
-import FavouriteToggle from './FavouriteToggle';
+import { Route } from "~/schemas/routeSchema";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { useRouteTripsQuery } from "~/hooks/useRouteTripsQuery";
+import TripCard from "./TripCard";
+import FavouriteToggle from "./FavouriteToggle";
 
 interface BusCardProps {
   route: Route;
@@ -13,14 +13,14 @@ const BusCard = ({ route }: BusCardProps) => {
     enabled: Boolean(route.id),
   });
 
-  const routeName = route.shortName || route.longName || 'Unknown Route';
+  const routeName = route.shortName || route.longName || "Unknown Route";
 
   return (
-    <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+    <Card className="cursor-pointer transition-shadow hover:shadow-lg">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>{routeName}</span>
-          <span className="flex items-center ml-2 space-x-2">
+          <span className="ml-2 flex items-center space-x-2">
             <span className="text-xs text-muted-foreground">{route.id}</span>
             <FavouriteToggle routeId={route.id} className="ml-1" />
           </span>

@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { ItemContainer } from '../ItemContainer';
+import { createFileRoute } from "@tanstack/react-router";
+import { ItemContainer } from "../ItemContainer";
 
-export const Route = createFileRoute('/playground/containers/searchitems')({
+export const Route = createFileRoute("/playground/containers/searchitems")({
   component: RouteComponent,
 });
 

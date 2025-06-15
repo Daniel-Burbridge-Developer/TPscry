@@ -7,7 +7,7 @@ export const StopPointZodSchema = z.object({
   arrivalTime: z
     .string()
     .describe(
-      "the scheduled arrival time for this stop, I don't currently use this"
+      "the scheduled arrival time for this stop, I don't currently use this",
     ),
   Sequence: z
     .number()
@@ -20,7 +20,7 @@ export const TripSelectZodSchema = z.object({
   serviceId: z
     .string()
     .describe(
-      "Identifier for the service schedule of this trip - I don't currently use this"
+      "Identifier for the service schedule of this trip - I don't currently use this",
     ),
   directionId: z
     .number()
@@ -32,7 +32,7 @@ export const TripSelectZodSchema = z.object({
     .nullable()
     .optional()
     .describe(
-      "Headsign or display name for the trip, represents the destination"
+      "Headsign or display name for the trip, represents the destination",
     ),
   shapeId: z
     .string()

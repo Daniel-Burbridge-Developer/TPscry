@@ -1,11 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router';
-import BusCard from '~/components/BusCard';
-import { useRouteStore } from '~/stores/routeStore';
-import { useQueries } from '@tanstack/react-query';
-import { routeByIdQuery } from '~/lib/queries/routes';
-import { Route as RouteType } from '~/schemas/routeSchema';
+import { createFileRoute } from "@tanstack/react-router";
+import BusCard from "~/components/BusCard";
+import { useRouteStore } from "~/stores/routeStore";
+import { useQueries } from "@tanstack/react-query";
+import { routeByIdQuery } from "~/lib/queries/routes";
+import { Route as RouteType } from "~/schemas/routeSchema";
 
-export const Route = createFileRoute('/playground/favContainer')({
+export const Route = createFileRoute("/playground/favContainer")({
   component: FavContainer,
 });
 
@@ -27,7 +27,7 @@ export function FavContainer() {
     .filter((r): r is RouteType => Boolean(r));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+    <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
       {isLoading && (
         <div className="col-span-full text-center">
           <p className="text-gray-500">Loading favourite routes...</p>

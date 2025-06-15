@@ -1,10 +1,10 @@
 // TODO: THE UI, AND THE PROGRESS LOGIC SHOULD BE REFACTORED, AND SEPERATED. THE PROGRESS LOGIC SHOULD BE RE-USABLE IN BOTH THIS BAR, AND A MAP VIEW THAT IS COMING LATER.
 // TODO: THE LINE IS CURRENTLY BROKEN, BUT WE COME BACK TO THIS LATER.
 
-import React from 'react';
-import type { LiveTripStop } from '~/schemas/tripLiveDetailsSchema';
-import { useTripProgress } from '~/hooks/useTripProgress';
-import { Bus, Check } from 'lucide-react';
+import React from "react";
+import type { LiveTripStop } from "~/schemas/tripLiveDetailsSchema";
+import { useTripProgress } from "~/hooks/useTripProgress";
+import { Bus, Check } from "lucide-react";
 
 interface LiveTripProgressProps {
   stops: LiveTripStop[];
@@ -28,13 +28,13 @@ const toSeconds = (t?: string | null): number => {
     string,
     string,
     string,
-    'am' | 'pm' | undefined,
+    "am" | "pm" | undefined,
   ];
   let h = parseInt(hStr, 10);
   const mm = parseInt(mStr, 10);
   if (ampm) {
-    if (ampm === 'pm' && h !== 12) h += 12;
-    if (ampm === 'am' && h === 12) h = 0;
+    if (ampm === "pm" && h !== 12) h += 12;
+    if (ampm === "am" && h === 12) h = 0;
   }
   return h * 3600 + mm * 60;
 };
@@ -50,9 +50,9 @@ const computeDelta = (
 
   if (Math.abs(diff) < 60) {
     // If the stop is delayed, show 'Delayed'
-    if (stop.status === 'Predicted') return 'Delayed';
-    if (diff < 0 && stop.status === 'Departed') return 'Departed just now';
-    if (diff >= 0) return 'Arriving soon';
+    if (stop.status === "Predicted") return "Delayed";
+    if (diff < 0 && stop.status === "Departed") return "Departed just now";
+    if (diff >= 0) return "Arriving soon";
     // diff < 0 but not departed -> show generic ago
   }
   return boundFormat(stop.time);
@@ -137,35 +137,35 @@ export const LiveTripProgress = ({
   const getDotClasses = (idx: number) => {
     const delayed = idx > 0 ? segments[idx - 1]?.delayed : false; // delay belongs to the segment leading *to* this stop
     if (idx < currentIndex)
-      return delayed ? 'bg-red-500 animate-pulse' : 'bg-green-500';
+      return delayed ? "bg-red-500 animate-pulse" : "bg-green-500";
     if (idx === currentIndex)
-      return 'bg-white border-4 border-green-500 animate-pulse';
+      return "bg-white border-4 border-green-500 animate-pulse";
     return delayed
-      ? 'bg-red-500/30 border-2 border-red-500'
-      : 'bg-white border-2 border-gray-300';
+      ? "bg-red-500/30 border-2 border-red-500"
+      : "bg-white border-2 border-gray-300";
   };
 
   return (
     <div>
-      <div className="flex justify-end mb-2">
+      <div className="mb-2 flex justify-end">
         <button
           className="text-sm text-primary underline"
           onClick={() => setIsShortView((v) => !v)}
         >
-          {isShortView ? 'Show full route' : 'Show condensed view'}
+          {isShortView ? "Show full route" : "Show condensed view"}
         </button>
       </div>
-      <div className={`relative pl-8 py-2 ${isShortView ? 'h-48' : ''}`}>
+      <div className={`relative py-2 pl-8 ${isShortView ? "h-48" : ""}`}>
         {/* Base vertical line */}
-        <div className="absolute left-3 top-0 bottom-0 w-1 bg-gray-200 rounded" />
+        <div className="absolute bottom-0 left-3 top-0 w-1 rounded bg-gray-200" />
         {/* Progress line (green) */}
         <div
-          className="absolute left-3 top-0 w-1 bg-green-500 rounded transition-all duration-500 ease-out"
+          className="absolute left-3 top-0 w-1 rounded bg-green-500 transition-all duration-500 ease-out"
           style={{ height: `${progressRatio * 100}%` }}
         />
         {/* Moving bus icon */}
         <Bus
-          className="absolute -left-2.5 w-6 h-6 text-primary z-10 transition-all duration-500 ease-out"
+          className="absolute -left-2.5 z-10 h-6 w-6 text-primary transition-all duration-500 ease-out"
           style={{ top: `calc(${progressRatio * 100}% - 12px)` }}
         />
         {/* Delayed portion overlay (red) */}
@@ -177,7 +177,7 @@ export const LiveTripProgress = ({
           return (
             <div
               key={`delay-${i}`}
-              className="absolute left-3 w-1 bg-red-500 rounded"
+              className="absolute left-3 w-1 rounded bg-red-500"
               style={{ top: `${topPct}%`, height: `${heightPct}%` }}
             />
           );
@@ -188,31 +188,31 @@ export const LiveTripProgress = ({
           const realIdx = isShortView ? startIndex + idx : idx;
           const timeSec = toSeconds(stop.time);
           const isDelayedStop =
-            stop.status === 'Predicted' && nowSeconds > timeSec;
+            stop.status === "Predicted" && nowSeconds > timeSec;
           return (
             <div
               key={stop.stopNumber}
               className="relative mb-8 last:mb-0"
-              style={{ minHeight: '2.5rem' }}
+              style={{ minHeight: "2.5rem" }}
             >
               <span
-                className={`absolute left-1.5 top-0 w-4 h-4 rounded-full flex items-center justify-center ${getDotClasses(realIdx)}`}
+                className={`absolute left-1.5 top-0 flex h-4 w-4 items-center justify-center rounded-full ${getDotClasses(realIdx)}`}
               >
                 {realIdx < currentIndex && (
-                  <Check className="w-3 h-3 text-white" />
+                  <Check className="h-3 w-3 text-white" />
                 )}
               </span>
               <div className="ml-8">
-                <span className="font-medium leading-tight block">
+                <span className="block font-medium leading-tight">
                   {stop.stopName}
                 </span>
                 <span
-                  className={`text-xs block ${isDelayedStop ? 'text-red-500' : 'text-muted-foreground'}`}
+                  className={`block text-xs ${isDelayedStop ? "text-red-500" : "text-muted-foreground"}`}
                 >
-                  {stop.time} {realIdx === currentIndex && '(Now)'}
+                  {stop.time} {realIdx === currentIndex && "(Now)"}
                 </span>
                 <span
-                  className={`text-xs ${isDelayedStop ? 'text-red-500' : 'text-muted-foreground'} block`}
+                  className={`text-xs ${isDelayedStop ? "text-red-500" : "text-muted-foreground"} block`}
                 >
                   {computeDelta(stop, nowSeconds, formatDelta)}
                 </span>

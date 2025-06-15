@@ -1,6 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { searchRoutesQuery } from '~/lib/queries/routes';
-import { Route } from '~/schemas/routeSchema';
+import { useQuery } from "@tanstack/react-query";
+import { searchRoutesQuery } from "~/lib/queries/routes";
 
 export const useSearchRoutesQuery = (
   searchSlug: string,

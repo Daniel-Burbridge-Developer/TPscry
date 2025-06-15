@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Zod Schemas for Type Safety
@@ -39,7 +39,7 @@ export const StopRouteSchema = z.object({
 export const BusStopSchema = z.object({
   id: z.string(),
   name: z.string(),
-  type: z.literal('stop'),
+  type: z.literal("stop"),
   routes: z.array(StopRouteSchema),
 });
 

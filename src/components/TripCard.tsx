@@ -1,8 +1,8 @@
-import React from 'react';
-import { useTripLiveStatus } from '~/hooks/useTripLiveStatus';
-import { Trip } from '~/schemas/index';
-import { useTripLiveDetails } from '~/hooks/useTripLiveDetails';
-import { LiveTripProgress } from '~/components/LiveTripProgress';
+import React from "react";
+import { useTripLiveStatus } from "~/hooks/useTripLiveStatus";
+import { Trip } from "~/schemas/index";
+import { useTripLiveDetails } from "~/hooks/useTripLiveDetails";
+import { LiveTripProgress } from "~/components/LiveTripProgress";
 
 interface TripCardProps {
   routeName: string;
@@ -26,13 +26,13 @@ const TripCard = ({ trip, routeName }: TripCardProps) => {
   });
 
   return (
-    <li className="p-2 rounded border border-muted bg-muted/50 flex flex-col relative">
+    <li className="relative flex flex-col rounded border border-muted bg-muted/50 p-2">
       <div className="flex items-center">
         <span className="font-medium text-primary">
-          {trip.tripHeadsign ? `to ${trip.tripHeadsign}` : 'No headsign'}
+          {trip.tripHeadsign ? `to ${trip.tripHeadsign}` : "No headsign"}
         </span>
         {isLive && (
-          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full bg-green-500/80 text-white text-[10px] font-semibold animate-pulse shadow-md">
+          <span className="ml-2 inline-flex animate-pulse items-center rounded-full bg-green-500/80 px-2 py-0.5 text-[10px] font-semibold text-white shadow-md">
             LIVE
           </span>
         )}
@@ -51,14 +51,14 @@ const TripCard = ({ trip, routeName }: TripCardProps) => {
       )}
 
       <button
-        className="absolute top-2 right-2 text-xs text-primary underline disabled:opacity-40"
+        className="absolute right-2 top-2 text-xs text-primary underline disabled:opacity-40"
         disabled={!isLive}
         onClick={(e) => {
           e.stopPropagation();
           setIsExpanded((prev) => !prev);
         }}
       >
-        {isExpanded ? 'Hide live progress' : 'Show live progress'}
+        {isExpanded ? "Hide live progress" : "Show live progress"}
       </button>
 
       {isExpanded && (

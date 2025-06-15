@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import type { LiveTripStop } from '~/schemas/tripLiveDetailsSchema';
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import type { LiveTripStop } from "~/schemas/tripLiveDetailsSchema";
 
 /***************************
  * Time helpers
@@ -23,15 +23,15 @@ const toSeconds = (t?: string | null): number => {
     string,
     string,
     string,
-    'am' | 'pm' | undefined,
+    "am" | "pm" | undefined,
   ];
 
   let hours = parseInt(hStr, 10);
   const minutes = parseInt(mStr, 10);
 
   if (ampm) {
-    if (ampm === 'pm' && hours !== 12) hours += 12;
-    if (ampm === 'am' && hours === 12) hours = 0;
+    if (ampm === "pm" && hours !== 12) hours += 12;
+    if (ampm === "am" && hours === 12) hours = 0;
   }
   return hours * 3600 + minutes * 60;
 };
@@ -61,7 +61,7 @@ const segmentProgress = (
   if (nowSeconds >= endTime) {
     return {
       ratio: 1,
-      delayed: endStop.status === 'Predicted', // still predicted => delay
+      delayed: endStop.status === "Predicted", // still predicted => delay
     };
   }
 
@@ -85,7 +85,7 @@ export const formatDelta = (
   const abs = Math.abs(diff);
 
   if (abs < 60) {
-    return diff < 0 ? 'Departed just now' : 'Arriving soon';
+    return diff < 0 ? "Departed just now" : "Arriving soon";
   }
   const mins = Math.floor(abs / 60);
   if (mins < 60) {
@@ -94,8 +94,8 @@ export const formatDelta = (
   const hours = Math.floor(mins / 60);
   const rem = mins % 60;
   return diff < 0
-    ? `${hours}h${rem ? ` ${rem}m` : ''} ago`
-    : `in ${hours}h${rem ? ` ${rem}m` : ''}`;
+    ? `${hours}h${rem ? ` ${rem}m` : ""} ago`
+    : `in ${hours}h${rem ? ` ${rem}m` : ""}`;
 };
 
 /***************************
@@ -158,7 +158,7 @@ export const useTripProgress = (
   const timeBucket = Math.floor(Date.now() / pollingIntervalMs);
 
   const queryResult = useQuery<UseTripProgressResult>({
-    queryKey: ['tripProgress', stops, explicitCurrentStopId, timeBucket],
+    queryKey: ["tripProgress", stops, explicitCurrentStopId, timeBucket],
     queryFn: () => {
       const now = new Date();
       const nowSec =
@@ -174,7 +174,7 @@ export const useTripProgress = (
         // Infer current stop as the *last* stop with status Arrived/Departed
         currentIdx = [...stops]
           .reverse()
-          .findIndex((s) => ['Arrived', 'Departed'].includes(s.status));
+          .findIndex((s) => ["Arrived", "Departed"].includes(s.status));
         if (currentIdx !== -1) {
           currentIdx = stops.length - 1 - currentIdx; // because reversed
         }
@@ -198,10 +198,10 @@ export const useTripProgress = (
         if (!currentStop || !nextStop) return 0;
 
         // Only time-animate if bus left currentStop AND nextStop is predicted
-        const leftCurrent = ['Departed', 'Predicted'].includes(
+        const leftCurrent = ["Departed", "Predicted"].includes(
           currentStop.status,
         );
-        const nextPredicted = nextStop.status === 'Predicted';
+        const nextPredicted = nextStop.status === "Predicted";
 
         if (!leftCurrent || !nextPredicted) return 0;
 
@@ -222,7 +222,7 @@ export const useTripProgress = (
         const ratio = getSegProg(i);
         const delayedFlag =
           ratio === 1 &&
-          stops[i + 1].status === 'Predicted' &&
+          stops[i + 1].status === "Predicted" &&
           nowSec > toSeconds(stops[i + 1].time);
         segments.push({
           startStop: stops[i],
@@ -247,7 +247,7 @@ export const useTripProgress = (
         segments,
         overallProgress: overall,
         getSegmentProgress: getSegProg,
-        formatDelta: () => '',
+        formatDelta: () => "",
       } as const;
     },
     enabled: enabled && stops.length > 1,
@@ -268,7 +268,7 @@ export const useTripProgress = (
       segments: [],
       overallProgress: 0,
       getSegmentProgress: () => 0,
-      formatDelta: () => '',
+      formatDelta: () => "",
     }),
     [stops],
   );

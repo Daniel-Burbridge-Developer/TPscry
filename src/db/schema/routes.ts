@@ -12,7 +12,7 @@ export const routes = pgTable(
   (routes) => [
     index("short_name_idx").on(routes.shortName),
     index("long_name_idx").on(routes.longName),
-  ]
+  ],
 );
 
 export type Route = typeof routes.$inferSelect;

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Schema for an individual stop within a live trip
 export const LiveTripStopSchema = z.object({

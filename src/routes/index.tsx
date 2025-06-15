@@ -1,30 +1,38 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { ChevronDown, Clock, Heart, RouteIcon, Search } from 'lucide-react';
-import { FetchingSearchBar } from '~/components/FetchingSearchBar';
+import { createFileRoute } from "@tanstack/react-router";
+import { ChevronDown, Clock, Heart, RouteIcon, Search } from "lucide-react";
+import { RouteAndStopSearchBar } from "~/components/search/RouteAndStopSearchBar";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '~/components/ui/collapsible';
-import { useSearchStore } from '~/stores/searchStore';
-import { useSearchRoutesQuery } from '~/hooks/useSearchRoutesQuery';
-import { useSearchStopsQuery } from '~/hooks/useSearchStopsQuery';
-import BusCard from '~/components/BusCard';
-import StopCard from '~/components/StopCard';
-import type { Stop } from '~/schemas/stopSchema';
+} from "~/components/ui/collapsible";
+import { useSearchStore } from "~/stores/searchStore";
+import { useSearchRoutesQuery } from "~/hooks/useSearchRoutesQuery";
+import { useSearchStopsQuery } from "~/hooks/useSearchStopsQuery";
+import BusCard from "~/components/BusCard";
+import StopCard from "~/components/StopCard";
+import type { Stop } from "~/schemas/stopSchema";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: Home,
 });
 
 function Home() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <Heading />
-      <SearchBar />
-      <SearchResults />
-      <RecentSearches />
-      <Favouites />
+    <div className="min-h-screen w-full bg-gradient-to-b from-red-800 to-red-900 py-8 sm:py-12">
+      <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 rounded-xl bg-white/90 px-4 py-8 shadow-lg sm:gap-6 sm:px-8 sm:py-10">
+        <h1 className="text-3xl font-extrabold tracking-tight text-red-800 drop-shadow-sm sm:text-4xl">
+          TP SCRY
+        </h1>
+        <p className="mb-2 text-center text-base text-gray-700 sm:text-lg">
+          Tracking{" "}
+          <span className="font-semibold text-red-700">Transperth</span> in
+          real-time
+        </p>
+        <div className="w-full pl-0 sm:pl-8">
+          <RouteAndStopSearchBar />
+        </div>
+      </div>
     </div>
   );
 }
@@ -39,7 +47,11 @@ const Heading = () => {
 };
 
 const SearchBar = () => {
-  return <FetchingSearchBar />;
+  return (
+    <div className="w-full">
+      <RouteAndStopSearchBar />
+    </div>
+  );
 };
 
 const SearchResults = () => {
@@ -47,20 +59,20 @@ const SearchResults = () => {
     <div>
       <div>
         <h1 className="flex items-center gap-2">
-          <Search className="w-6 h-6" />
+          <Search className="h-6 w-6" />
           Search Results
         </h1>
       </div>
       <div>
         <h1 className="flex items-center gap-2">
-          <RouteIcon className="w-6 h-6" />
+          <RouteIcon className="h-6 w-6" />
           Routes
         </h1>
         <Collapsible>
           {/* Routes Section */}
           <CollapsibleTrigger>
             <div className="flex items-center gap-2">
-              <ChevronDown className="w-6 h-6" />
+              <ChevronDown className="h-6 w-6" />
               <span>Routes</span>
             </div>
           </CollapsibleTrigger>
@@ -71,7 +83,7 @@ const SearchResults = () => {
           {/* Stops Section */}
           <CollapsibleTrigger>
             <div className="flex items-center gap-2">
-              <ChevronDown className="w-6 h-6" />
+              <ChevronDown className="h-6 w-6" />
               <span>Stops</span>
             </div>
           </CollapsibleTrigger>
@@ -93,22 +105,22 @@ const RecentSearches = () => {
   return (
     <div>
       <h1 className="flex items-center gap-2">
-        <Clock className="w-6 h-6" />
+        <Clock className="h-6 w-6" />
         Recent Searches
       </h1>
       <div>
         {recentSearches.length <= 0 ? (
           <p>No recent searches</p>
         ) : (
-          <div className="flex flex-wrap flex-row-reverse gap-2 w-fit">
+          <div className="flex w-fit flex-row-reverse flex-wrap gap-2">
             {recentSearches.map((term) => (
               <button
                 key={term}
                 type="button"
-                className="px-2 py-1 rounded bg-gray-100 text-sm hover:bg-gray-200 transition-colors"
+                className="rounded bg-gray-100 px-2 py-1 text-sm transition-colors hover:bg-gray-200"
                 onClick={() => {
-                  setSearchTerm('routes', term);
-                  setSearchTerm('stops', term);
+                  setSearchTerm("routes", term);
+                  setSearchTerm("stops", term);
                 }}
               >
                 {term}
@@ -125,7 +137,7 @@ const Favouites = () => {
   return (
     <div>
       <h1 className="flex items-center gap-2">
-        <Heart className="w-6 h-6" />
+        <Heart className="h-6 w-6" />
         Favourites
       </h1>
     </div>
@@ -148,7 +160,7 @@ const RoutesResults = () => {
 
   if (!debouncedSearchTerm) {
     return (
-      <p className="text-sm text-muted-foreground px-4">
+      <p className="px-4 text-sm text-muted-foreground">
         Type a search term to find routes.
       </p>
     );
@@ -156,18 +168,18 @@ const RoutesResults = () => {
 
   if (isLoading) {
     return (
-      <p className="text-sm text-muted-foreground px-4">Loading routes…</p>
+      <p className="px-4 text-sm text-muted-foreground">Loading routes…</p>
     );
   }
 
   if (isError || !routes || routes.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground px-4">No routes found.</p>
+      <p className="px-4 text-sm text-muted-foreground">No routes found.</p>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+    <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
       {routes.map((route) => (
         <BusCard key={route.id} route={route} />
       ))}
@@ -193,24 +205,24 @@ const StopsResults = () => {
 
   if (!debouncedSearchTerm) {
     return (
-      <p className="text-sm text-muted-foreground px-4">
+      <p className="px-4 text-sm text-muted-foreground">
         Type a search term to find stops.
       </p>
     );
   }
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground px-4">Loading stops…</p>;
+    return <p className="px-4 text-sm text-muted-foreground">Loading stops…</p>;
   }
 
   if (isError || !stopsArray || stopsArray.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground px-4">No stops found.</p>
+      <p className="px-4 text-sm text-muted-foreground">No stops found.</p>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+    <div className="grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3">
       {stopsArray.map((stop) => (
         <StopCard key={stop.id} stop={stop} />
       ))}
