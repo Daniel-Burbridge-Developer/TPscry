@@ -10,23 +10,21 @@ export function RouteAndStopSearchBar() {
   const setSearchTerm = useSearchStore((state) => state.setSearchTerm);
 
   return (
-    <div className="w-full shadow-lg">
-      <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400">
-          <Search className="h-5 w-5" />
-        </span>
-        <Input
-          value={searchTerm}
-          onChange={(e) => {
-            const value = e.target.value;
-            // Update both route and stop search terms to keep them in sync
-            setSearchTerm("routes", value);
-            setSearchTerm("stops", value);
-          }}
-          placeholder="Search for routes or stops..."
-          className="pl-10"
-        />
-      </div>
+    <div className="relative flex w-full items-center">
+      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400">
+        <Search className="h-5 w-5" />
+      </span>
+      <Input
+        value={searchTerm}
+        onChange={(e) => {
+          const value = e.target.value;
+          // Update both route and stop search terms to keep them in sync
+          setSearchTerm("routes", value);
+          setSearchTerm("stops", value);
+        }}
+        placeholder="Search for routes or stops..."
+        className="h-12 pl-10 md:h-14"
+      />
     </div>
   );
 }
