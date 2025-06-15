@@ -1,29 +1,41 @@
 import { Input } from './ui/input';
 import { useSearchRoutesQuery } from '~/hooks/useSearchRoutesQuery';
+import { useSearchStopsQuery } from '~/hooks/useSearchStopsQuery';
 import { useSearchStore } from '~/stores/searchStore';
 
 export function FetchingSearchBar() {
   const searchTerm = useSearchStore((state) => state.searchTerms.routes);
-  const debouncedSearchTerm = useSearchStore(
+  const debouncedRouteTerm = useSearchStore(
     (state) => state.debouncedSearchTerms.routes,
+  );
+  const debouncedStopTerm = useSearchStore(
+    (state) => state.debouncedSearchTerms.stops,
   );
   const setSearchTerm = useSearchStore((state) => state.setSearchTerm);
   const recentSearches = useSearchStore(
     (state) => state.recentSearchTerms.routes,
   );
 
-  const { data: routes, isLoading } = useSearchRoutesQuery(
-    debouncedSearchTerm,
-    {
-      enabled: Boolean(debouncedSearchTerm),
-    },
-  );
+  // Fire route query
+  useSearchRoutesQuery(debouncedRouteTerm, {
+    enabled: Boolean(debouncedRouteTerm),
+  });
+
+  // Fire stop query simultaneously
+  useSearchStopsQuery(debouncedStopTerm, {
+    enabled: Boolean(debouncedStopTerm),
+  });
 
   return (
     <div className="w-full max-w-md">
       <Input
         value={searchTerm}
-        onChange={(e) => setSearchTerm('routes', e.target.value)}
+        onChange={(e) => {
+          const value = e.target.value;
+          // Update both route and stop search terms to keep them in sync
+          setSearchTerm('routes', value);
+          setSearchTerm('stops', value);
+        }}
         placeholder="Search..."
       />
 
@@ -36,7 +48,10 @@ export function FetchingSearchBar() {
                 key={term}
                 type="button"
                 className="px-2 py-1 rounded bg-gray-100 text-sm hover:bg-gray-200 transition-colors"
-                onClick={() => setSearchTerm('routes', term)}
+                onClick={() => {
+                  setSearchTerm('routes', term);
+                  setSearchTerm('stops', term);
+                }}
               >
                 {term}
               </button>
