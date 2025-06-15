@@ -1,29 +1,67 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
+import { Clock, Heart, Search } from 'lucide-react';
+import { FetchingSearchBar } from '~/components/FetchingSearchBar';
 
 export const Route = createFileRoute('/')({
   component: Home,
 });
 
 function Home() {
-  const routes = [
-    { path: '/playground/searching', label: 'Search Playground' },
-    // Add more routes here as they are created
-  ];
-
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">TP SCRY</h1>
-      <div className="space-y-2">
-        {routes.map((route) => (
-          <Link
-            key={route.path}
-            to={route.path}
-            className="block p-2 hover:bg-gray-100 rounded transition-colors"
-          >
-            {route.label}
-          </Link>
-        ))}
-      </div>
+    <div className="flex flex-col items-center justify-center h-screen">
+      <Heading />
+      <SearchBar />
+      <SearchResults />
+      <RecentSearches />
+      <Favouites />
     </div>
   );
 }
+
+const Heading = () => {
+  return (
+    <div>
+      <h1>TP SCRY</h1>
+      <p>Tracking Transperth in real-time</p>
+    </div>
+  );
+};
+
+const SearchBar = () => {
+  return <FetchingSearchBar />;
+};
+
+const SearchResults = () => {
+  return (
+    <div>
+      <div>
+        <h1 className="flex items-center gap-2">
+          <Search className="w-6 h-6" />
+          Search Results
+        </h1>
+      </div>
+    </div>
+  );
+};
+
+const RecentSearches = () => {
+  return (
+    <div>
+      <h1 className="flex items-center gap-2">
+        <Clock className="w-6 h-6" />
+        Recent Searches
+      </h1>
+    </div>
+  );
+};
+
+const Favouites = () => {
+  return (
+    <div>
+      <h1 className="flex items-center gap-2">
+        <Heart className="w-6 h-6" />
+        Favourites
+      </h1>
+    </div>
+  );
+};

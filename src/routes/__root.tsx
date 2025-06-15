@@ -16,6 +16,7 @@ import { seo } from '~/utils/seo';
 import { Analytics } from '@vercel/analytics/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import Footer from '~/components/Footer';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -106,6 +107,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           <Analytics />
           <Scripts />
         </QueryClientProvider>
+        <Footer />
       </body>
     </html>
   );
