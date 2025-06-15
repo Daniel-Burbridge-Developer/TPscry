@@ -19,17 +19,17 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-red-800 to-red-900 py-8 sm:py-12">
+    <div className="min-h-screen w-full bg-gradient-to-b from-blue-800 to-blue-900 py-8 sm:py-12">
       <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 rounded-xl bg-white/90 px-4 py-8 shadow-lg sm:gap-6 sm:px-8 sm:py-10">
-        <h1 className="text-3xl font-extrabold tracking-tight text-red-800 drop-shadow-sm sm:text-4xl">
+        <h1 className="text-3xl font-extrabold tracking-tight text-blue-800 drop-shadow-sm sm:text-4xl">
           TP SCRY
         </h1>
         <p className="mb-2 text-center text-base text-gray-700 sm:text-lg">
           Tracking{" "}
-          <span className="font-semibold text-red-700">Transperth</span> in
+          <span className="font-semibold text-blue-700">Transperth</span> in
           real-time
         </p>
-        <div className="w-full pl-0 sm:pl-8">
+        <div className="mx-auto w-full">
           <RouteAndStopSearchBar />
         </div>
       </div>

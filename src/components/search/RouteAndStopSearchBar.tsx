@@ -10,7 +10,7 @@ export function RouteAndStopSearchBar() {
   const setSearchTerm = useSearchStore((state) => state.setSearchTerm);
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full shadow-lg">
       <div className="relative">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400">
           <Search className="h-5 w-5" />
