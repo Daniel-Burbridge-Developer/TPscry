@@ -27,6 +27,7 @@ import { useRouteStore } from "~/stores/routeStore";
 import { routeByIdQuery } from "~/lib/queries/routes";
 import { useQueries } from "@tanstack/react-query";
 import { Route as RouteType } from "~/schemas/routeSchema";
+import SearchResults from "~/components/search/SearchResults";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -39,7 +40,7 @@ function Home() {
         <div className="flex w-full flex-col items-center justify-center gap-6">
           <Heading />
           <SearchBar />
-          <SearchResults />
+          <SearchResultsWrapper />
         </div>
         <div className="flex w-full flex-row items-center justify-center gap-6">
           <RecentSearches />
@@ -104,46 +105,10 @@ const SearchBar = () => {
   );
 };
 
-const SearchResults = () => {
+const SearchResultsWrapper = () => {
   return (
     <BackdropCard className="w-full" contentClassName="p-0">
-      <div className="flex w-full flex-col items-center">
-        <div className="flex w-full flex-col items-center">
-          <h1 className="flex items-center justify-center gap-2">
-            <Search className="h-6 w-6" />
-            Search Results
-          </h1>
-        </div>
-        <div className="flex w-full flex-col items-center">
-          <h1 className="flex items-center justify-center gap-2">
-            <RouteIcon className="h-6 w-6" />
-            Routes
-          </h1>
-          <Collapsible className="w-full">
-            {/* Routes Section */}
-            <CollapsibleTrigger>
-              <div className="flex w-full items-center justify-center gap-2">
-                <ChevronDown className="h-6 w-6" />
-                <span>Routes</span>
-              </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <RoutesResults />
-            </CollapsibleContent>
-
-            {/* Stops Section */}
-            <CollapsibleTrigger>
-              <div className="flex w-full items-center justify-center gap-2">
-                <ChevronDown className="h-6 w-6" />
-                <span>Stops</span>
-              </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <StopsResults />
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-      </div>
+      <SearchResults />
     </BackdropCard>
   );
 };

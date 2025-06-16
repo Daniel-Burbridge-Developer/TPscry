@@ -53,7 +53,7 @@ export const ServerRoute = createServerFileRoute(
       const validatedStops = StopSelectZodSchema.array().parse(matchingStops);
       console.log("🔍 Validated stops:", validatedStops.length);
 
-      return json(validatedStops);
+      return json(validatedStops || []);
     } catch (error) {
       console.error("❌ Error searching stops:", error);
       return json({ error: "Internal server error" }, { status: 500 });

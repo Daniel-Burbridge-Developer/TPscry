@@ -52,7 +52,7 @@ export const ServerRoute = createServerFileRoute(
       const validatedRoutes = routeSchema.array().parse(matchingRoutes);
       console.log("🔍 Validated routes:", validatedRoutes.length);
 
-      return json(validatedRoutes);
+      return json(validatedRoutes || []);
     } catch (error) {
       console.error("❌ Error searching routes:", error);
       return json({ error: "Internal server error" }, { status: 500 });

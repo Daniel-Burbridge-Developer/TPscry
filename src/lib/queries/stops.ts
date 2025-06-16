@@ -1,9 +1,9 @@
 import { apiFetch } from "~/lib/apiClient";
-import { StopSelectZodSchema } from "~/schemas/stopSchema";
+import { StopSelectZodSchema, Stop } from "~/schemas/stopSchema";
 
 export const searchStopsQuery = (searchSlug: string) => ({
   queryKey: ["stops", "search", searchSlug],
-  queryFn: () =>
+  queryFn: (): Promise<Stop[]> =>
     apiFetch(`/api/fuzzy/stop/${searchSlug}`, undefined, {
       responseSchema: StopSelectZodSchema.array(),
     }),
