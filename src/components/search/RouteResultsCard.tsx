@@ -7,12 +7,13 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { ChevronUp, ChevronDown, Route } from "lucide-react";
 import { Route as RouteType } from "~/schemas";
+import { RouteResultItem } from "./RouteResultItem";
 
-type BusResultsCardProps = {
+type RouteResultsCardProps = {
   routes: RouteType[];
 };
 
-const BusResultsCard = ({ routes }: BusResultsCardProps) => {
+const RouteResultsCard = ({ routes }: RouteResultsCardProps) => {
   const [busRoutesExpanded, setBusRoutesExpanded] = useState(true);
 
   if (!routes || routes.length === 0) return null;
@@ -29,7 +30,7 @@ const BusResultsCard = ({ routes }: BusResultsCardProps) => {
               <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
                 <div className="flex items-center gap-2">
                   <Route className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Bus Routes ({routes.length})
+                  Routes ({routes.length})
                 </div>
                 {busRoutesExpanded ? (
                   <ChevronUp className="h-5 w-5 text-gray-500" />
@@ -42,7 +43,7 @@ const BusResultsCard = ({ routes }: BusResultsCardProps) => {
           <CollapsibleContent>
             <CardContent className="space-y-3 pt-0 sm:space-y-4">
               {routes.map((route) => (
-                <div key={route.id}>{route.longName || route.shortName}</div>
+                <RouteResultItem key={route.id} route={route} />
               ))}
             </CardContent>
           </CollapsibleContent>
@@ -52,4 +53,4 @@ const BusResultsCard = ({ routes }: BusResultsCardProps) => {
   );
 };
 
-export default BusResultsCard;
+export default RouteResultsCard;

@@ -10,7 +10,7 @@ import { CardHeader, CardTitle, Card, CardContent } from "../ui/card";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { Route } from "lucide-react";
 import { useState } from "react";
-import BusResultsCard from "./BusResultsCard";
+import BusResultsCard from "./RouteResultsCard";
 import StopResultsCard from "./StopResultsCard";
 
 const SearchResults = () => {

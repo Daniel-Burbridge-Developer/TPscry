@@ -7,6 +7,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { ChevronUp, ChevronDown, MapPin } from "lucide-react";
 import { Stop } from "~/schemas/stopSchema";
+import { StopResultItem } from "./StopResultItem";
 
 type StopResultsCardProps = {
   stops: Stop[];
@@ -42,15 +43,7 @@ const StopResultsCard = ({ stops }: StopResultsCardProps) => {
           <CollapsibleContent>
             <CardContent className="space-y-3 pt-0 sm:space-y-4">
               {stops.map((stop) => (
-                <div
-                  key={stop.id}
-                  className="flex items-center justify-between rounded-lg p-2 dark:bg-gray-900"
-                >
-                  <span className="font-medium">{stop.name}</span>
-                  <span className="ml-4 text-xs text-gray-500 dark:text-gray-400">
-                    {stop.id}
-                  </span>
-                </div>
+                <StopResultItem key={stop.id} stop={stop} />
               ))}
             </CardContent>
           </CollapsibleContent>
