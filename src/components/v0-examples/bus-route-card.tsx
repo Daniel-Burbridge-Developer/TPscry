@@ -30,7 +30,7 @@ interface Bus {
   routes: Route[];
 }
 
-interface BusRouteItemProps {
+interface BusRouteCardProps {
   bus: Bus;
   isExpanded: boolean;
   onToggleExpansion: () => void;
@@ -38,7 +38,7 @@ interface BusRouteItemProps {
 }
 
 /**
- * BusRouteItem Component
+ * BusRouteCard Component
  *
  * TODO for your implementation:
  * - Replace Route and Bus interfaces with your Zod schemas
@@ -46,12 +46,12 @@ interface BusRouteItemProps {
  * - Implement route favoriting functionality
  * - Add accessibility improvements (ARIA labels, keyboard navigation)
  */
-export function BusRouteItem({
+export function BusRouteCard({
   bus,
   isExpanded,
   onToggleExpansion,
   onRouteSelect,
-}: BusRouteItemProps) {
+}: BusRouteCardProps) {
   const liveRoutesCount = bus.routes.filter((r) => r.isLive).length;
 
   return (

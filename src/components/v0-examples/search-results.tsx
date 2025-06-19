@@ -7,7 +7,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { BusRouteItem } from "./bus-route-item";
+import { BusRouteItem } from "./bus-route-card";
 import { BusStopItem } from "./bus-stop-item";
 
 // TODO: Replace with your Zod schema types

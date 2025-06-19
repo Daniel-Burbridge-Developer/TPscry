@@ -33,7 +33,7 @@ interface BusStop {
   routes: StopRoute[];
 }
 
-interface BusStopItemProps {
+interface BusStopCardProps {
   stop: BusStop;
   isExpanded: boolean;
   onToggleExpansion: () => void;
@@ -41,7 +41,7 @@ interface BusStopItemProps {
 }
 
 /**
- * BusStopItem Component
+ * BusStopCard Component
  *
  * TODO for your implementation:
  * - Replace StopRoute and BusStop interfaces with your Zod schemas
@@ -50,12 +50,12 @@ interface BusStopItemProps {
  * - Add stop facilities information (accessibility, amenities)
  * - Add nearby stops functionality
  */
-export function BusStopItem({
+export function BusStopCard({
   stop,
   isExpanded,
   onToggleExpansion,
   onRouteSelect,
-}: BusStopItemProps) {
+}: BusStopCardProps) {
   const liveRoutesCount = stop.routes.filter((r) => r.isLive).length;
 
   return (

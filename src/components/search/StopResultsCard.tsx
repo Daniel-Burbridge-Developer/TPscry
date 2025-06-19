@@ -7,7 +7,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { ChevronUp, ChevronDown, MapPin } from "lucide-react";
 import { Stop } from "~/schemas/stopSchema";
-import { StopResultItem } from "./StopResultItem";
+import { StopResultItem } from "./StopResultCard";
 
 type StopResultsCardProps = {
   stops: Stop[];

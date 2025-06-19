@@ -7,7 +7,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { ChevronUp, ChevronDown, Route } from "lucide-react";
 import { Route as RouteType } from "~/schemas";
-import { RouteResultItem } from "./RouteResultItem";
+import { RouteResultItem } from "./RouteResultCard";
 
 type RouteResultsCardProps = {
   routes: RouteType[];
