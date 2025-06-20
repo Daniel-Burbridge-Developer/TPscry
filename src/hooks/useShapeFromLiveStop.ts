@@ -32,12 +32,17 @@ export const useShapeFromLiveStop = (
   // Derive live tripId (if any)
   const liveTripId = useMemo(() => {
     const rows = externalQuery.data ?? [];
-    const live = rows.find(
-      (r) =>
-        r.liveStatus &&
-        r.tripId &&
-        (!routeNumber || r.busNumber === routeNumber),
-    );
+    const normalise = (s: string | null | undefined) =>
+      (s ?? "").replace(/^0+/, "").toLowerCase();
+
+    const targetRoute = normalise(routeNumber);
+
+    const live = rows.find((r) => {
+      if (!r.liveStatus || !r.tripId) return false;
+      if (!routeNumber) return true;
+      // Compare after normalising leading zeros / case differences.
+      return normalise(r.busNumber) === targetRoute;
+    });
     return live?.tripId ?? null;
   }, [externalQuery.data, routeNumber]);
 

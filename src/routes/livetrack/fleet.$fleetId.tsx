@@ -49,9 +49,11 @@ function minutesUntil(timeStr?: string | null): number | null {
 function Header({
   destination,
   isLive,
+  routeNumber,
 }: {
   destination: string;
   isLive: boolean;
+  routeNumber?: string | null;
 }) {
   return (
     <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:gap-4">
@@ -64,7 +66,10 @@ function Header({
       <div className="flex-1">
         <h1 className="text-xl font-bold sm:text-2xl">Route Tracking</h1>
         <p className="text-sm text-muted-foreground sm:text-base">
-          to {destination} • {isLive ? "Live Tracking" : "Offline"}
+          {routeNumber
+            ? `Bus ${routeNumber} to ${destination}`
+            : `to ${destination}`}{" "}
+          • {isLive ? "Live Tracking" : "Offline"}
         </p>
       </div>
       <Badge
@@ -444,16 +449,33 @@ function LiveRouteMap({
       }
     });
 
-    // Coordinates for shape path (if provided)
+    // Coordinates for shape path (if provided). We coerce lat/lon to numbers to
+    // guard against any string values coming from the API.
     const shapeCoords = shapePoints
-      .filter(
-        (p: ShapePoint) =>
-          typeof p.lat === "number" && typeof p.lon === "number",
+      .map(
+        (p: ShapePoint) => [Number(p.lat), Number(p.lon), p.sequence] as const,
       )
-      .sort((a: ShapePoint, b: ShapePoint) => a.sequence - b.sequence)
-      .map((p: ShapePoint) => [p.lat, p.lon] as [number, number]);
+      .filter(([lat, lon]) => Number.isFinite(lat) && Number.isFinite(lon))
+      .sort((a, b) => a[2] - b[2]) // sort by sequence
+      .map(([lat, lon]) => [lat, lon] as [number, number]);
 
-    const polyCoordsToUse = shapeCoords.length > 1 ? shapeCoords : coordsList;
+    // Decide whether shape path provides additional granularity over stop list.
+    let useShapePath = false;
+    if (shapeCoords.length > 1) {
+      if (shapeCoords.length > coordsList.length) {
+        useShapePath = true;
+      } else {
+        // If counts are equal, check if shape points differ from stop coords.
+        const EPS = 1e-6;
+        const differs = shapeCoords.some(([lat, lon], idx) => {
+          const [slat, slon] = coordsList[idx] ?? [];
+          return Math.abs(lat - slat) > EPS || Math.abs(lon - slon) > EPS;
+        });
+        useShapePath = differs;
+      }
+    }
+
+    const polyCoordsToUse = useShapePath ? shapeCoords : coordsList;
 
     // ----- Determine where to split the polyline into completed & upcoming -----
     let completedCoords: [number, number][] = [];
@@ -712,6 +734,7 @@ function RouteComponent() {
             trip.stops[trip.stops.length - 1]?.stopName ?? "Destination"
           }
           isLive={!error}
+          routeNumber={trip.routeNumber}
         />
 
         {/* Status summary */}
