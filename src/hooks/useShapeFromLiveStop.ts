@@ -6,14 +6,14 @@ import { TripSelectZodSchema, type Trip } from "~/schemas/tripSchema";
 import { ShapeSelectZodSchema, Shape } from "~/schemas/shapeSchema";
 
 // Helper fetchers
-const fetchTrip = async (tripId: string) => {
-  return apiFetch(`/api/trip/${tripId}`, undefined, {
+const fetchTrip = async (tripId: string): Promise<Trip> => {
+  return apiFetch<Trip>(`/api/trip/${tripId}`, undefined, {
     responseSchema: TripSelectZodSchema,
   });
 };
 
 const fetchShape = async (shapeId: string | number): Promise<Shape> => {
-  return apiFetch(`/api/shape/${shapeId}`, undefined, {
+  return apiFetch<Shape>(`/api/shape/${shapeId}`, undefined, {
     responseSchema: ShapeSelectZodSchema,
   });
 };
