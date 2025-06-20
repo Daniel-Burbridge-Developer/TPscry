@@ -133,6 +133,11 @@ const RecentSearches = () => {
             <div
               key={index}
               className="flex cursor-pointer items-center justify-between rounded-lg p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 sm:p-3"
+              onClick={() => {
+                // Populate both route and stop search terms so results stay in sync
+                setSearchTerm("routes", search);
+                setSearchTerm("stops", search);
+              }}
             >
               <span className="text-sm">{search}</span>
               <ChevronRight className="h-4 w-4 text-gray-400" />
@@ -145,8 +150,10 @@ const RecentSearches = () => {
 };
 
 const Favouites = () => {
-  // Get favourite route IDs from the store
-  const favouriteRouteIds = useRouteStore((state) => state.favouriteRouteIds);
+  const { favouriteRouteIds, addFavouriteRouteId, removeFavouriteRouteId } =
+    useRouteStore();
+
+  const setSearchTerm = useSearchStore((state) => state.setSearchTerm);
 
   // Fetch details for each favourite route in parallel
   const routeQueries = useQueries({
@@ -174,12 +181,28 @@ const Favouites = () => {
             <div
               key={index}
               className="flex cursor-pointer items-center justify-between rounded-lg p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 sm:p-3"
+              onClick={() => {
+                // Populate search bar when a favourite is clicked
+                const term = favorite.longName || favorite.shortName || "";
+                setSearchTerm("routes", term);
+                setSearchTerm("stops", term);
+              }}
             >
               <span className="text-sm">
                 {favorite.longName || favorite.shortName}
               </span>
               <div className="flex items-center gap-2">
-                <Heart className="h-4 w-4 fill-current text-red-500" />
+                <Heart
+                  className="h-4 w-4 cursor-pointer fill-current text-red-500"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent triggering the parent onClick
+                    if (favouriteRouteIds.includes(favorite.id)) {
+                      removeFavouriteRouteId(favorite.id);
+                    } else {
+                      addFavouriteRouteId(favorite.id);
+                    }
+                  }}
+                />
                 <ChevronRight className="h-4 w-4 text-gray-400" />
               </div>
             </div>

@@ -11,7 +11,8 @@ const StopArrivalCard = ({ arrival }: StopArrivalCardProps) => {
   const { liveStatus, busNumber, timeUntilArrival, destination, fleetId } =
     arrival;
 
-  return (
+  // Prepare the card content so we can optionally wrap it with a Link
+  const cardContent = (
     <div className="flex cursor-pointer flex-col justify-between gap-2 rounded-lg border bg-white p-3 transition-shadow hover:shadow-md dark:bg-gray-900 sm:flex-row sm:items-center sm:gap-3">
       {/* Left section: live icon + bus number + badge */}
       <div className="flex items-center gap-3">
@@ -32,13 +33,7 @@ const StopArrivalCard = ({ arrival }: StopArrivalCardProps) => {
             variant={liveStatus ? "default" : "secondary"}
             className="text-xs"
           >
-            {liveStatus && fleetId ? (
-              <Link to="/livetrack/fleet/$fleetId" params={{ fleetId }}>
-                Live Track
-              </Link>
-            ) : (
-              "Offline"
-            )}
+            {liveStatus && fleetId ? "Live Track" : "Offline"}
           </Badge>
         )}
       </div>
@@ -54,6 +49,15 @@ const StopArrivalCard = ({ arrival }: StopArrivalCardProps) => {
         )}
       </div>
     </div>
+  );
+
+  // If the arrival has live status and a fleetId, make the whole card clickable
+  return liveStatus && fleetId ? (
+    <Link to="/livetrack/fleet/$fleetId" params={{ fleetId }} className="block">
+      {cardContent}
+    </Link>
+  ) : (
+    cardContent
   );
 };
 
