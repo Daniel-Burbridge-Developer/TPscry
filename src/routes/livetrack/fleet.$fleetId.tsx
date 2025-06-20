@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useQueries } from "@tanstack/react-query";
+import { searchStopsQuery } from "~/lib/queries/stops";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
@@ -230,6 +232,128 @@ function FullRouteView({ stops, nextStopId }: FullRouteViewProps) {
 }
 
 /* --------------------------------------------------
+ * Leaflet map view (client-only)
+ * ------------------------------------------------*/
+type StopWithCoords = {
+  stopName: string;
+  stopNumber: string;
+  status: string;
+  delayMinutes: number;
+  lat?: number;
+  lon?: number;
+};
+
+function LiveRouteMap({
+  stops,
+  nextStopId,
+}: {
+  stops: readonly StopWithCoords[];
+  nextStopId: string | null;
+}) {
+  const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  const mapInstanceRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return; // SSR safeguard
+
+    let isCancelled = false;
+
+    (async () => {
+      const [{ default: L }] = await Promise.all([
+        // @ts-ignore – leaflet types not installed yet
+        import(/* @vite-ignore */ "leaflet"),
+        // ensure Leaflet CSS once
+        new Promise((res) => {
+          if (document.getElementById("leaflet-style")) return res(null);
+          const link = document.createElement("link");
+          link.id = "leaflet-style";
+          link.rel = "stylesheet";
+          link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+          document.head.appendChild(link);
+          link.onload = () => res(null);
+        }),
+      ]);
+
+      if (isCancelled || !mapContainerRef.current) return;
+
+      // Clean up previous instance if re-rendering
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+
+      // Collect coordinates
+      const coordsList = stops
+        .filter((s) => typeof s.lat === "number" && typeof s.lon === "number")
+        .map((s) => [s.lat as number, s.lon as number] as [number, number]);
+
+      const defaultCenter: [number, number] = coordsList[0] ?? [
+        -31.9523, 115.8613,
+      ]; // Perth
+
+      const map = L.map(mapContainerRef.current).setView(defaultCenter, 13);
+      mapInstanceRef.current = map;
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+        maxZoom: 19,
+      }).addTo(map);
+
+      const markerIcon = L.icon({
+        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+      });
+
+      coordsList.forEach((coords, idx) => {
+        const stop = stops[idx];
+        const isCurrent = stop.stopNumber === nextStopId;
+
+        const icon = isCurrent
+          ? L.icon({
+              iconUrl:
+                "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+              shadowUrl:
+                "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+              iconSize: [25, 41],
+              iconAnchor: [12, 41],
+              className: "current-stop-marker",
+            })
+          : markerIcon;
+
+        L.marker(coords, { icon, title: stop.stopName })
+          .addTo(map)
+          .bindPopup(
+            `${stop.stopName}<br/>${isCurrent ? "Current Stop" : stop.status === "Departed" ? "Completed" : "Upcoming"}$${stop.delayMinutes > 0 ? ` (+${stop.delayMinutes} min)` : ""}`,
+          );
+      });
+
+      if (coordsList.length > 1) {
+        L.polyline(coordsList, { color: "blue" }).addTo(map);
+        map.fitBounds(L.latLngBounds(coordsList), { padding: [20, 20] });
+      }
+    })();
+
+    return () => {
+      isCancelled = true;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [stops, nextStopId]);
+
+  return (
+    <div
+      ref={mapContainerRef}
+      className="h-96 w-full rounded-md border border-muted shadow-inner"
+    />
+  );
+}
+
+/* --------------------------------------------------
  * Main Route component
  * ------------------------------------------------*/
 function RouteComponent() {
@@ -248,6 +372,28 @@ function RouteComponent() {
 
   // Tab selection (declare before any early-return to keep hook order stable)
   const [activeTab, setActiveTab] = useState<"full" | "map">("full");
+
+  const effectiveStops = stopsWithDelay ?? [];
+
+  // Fetch lat/lon for each stop in parallel
+  const coordQueries = useQueries({
+    queries: effectiveStops.map((s) => ({
+      ...searchStopsQuery(s.stopNumber),
+      staleTime: 1000 * 60 * 60,
+      gcTime: 1000 * 60 * 60 * 6,
+    })),
+  });
+
+  const stopsWithCoords = effectiveStops.map((stop, idx) => {
+    const q = coordQueries[idx];
+    const firstMatch =
+      Array.isArray(q.data) && q.data.length > 0 ? q.data[0] : null;
+    return {
+      ...stop,
+      lat: firstMatch?.lat,
+      lon: firstMatch?.lon,
+    } as StopWithCoords;
+  });
 
   // Loading state
   if (isLoading) {
@@ -335,8 +481,11 @@ function RouteComponent() {
               </div>
             )}
             {activeTab === "map" && (
-              <div className="mt-4 text-center sm:mt-6">
-                Map view coming soon…
+              <div className="mt-4 sm:mt-6">
+                <LiveRouteMap
+                  stops={stopsWithCoords}
+                  nextStopId={nextStop?.stopNumber ?? null}
+                />
               </div>
             )}
           </CardContent>
