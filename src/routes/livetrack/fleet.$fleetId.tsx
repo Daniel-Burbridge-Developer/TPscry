@@ -8,6 +8,7 @@ import { Progress } from "~/components/ui/progress";
 import { useTripLiveDetails } from "~/hooks/useTripLiveDetails";
 import { Wifi, WifiOff } from "lucide-react";
 import { cn } from "~/lib/utils";
+import { useShapeFromLiveStop } from "~/hooks/useShapeFromLiveStop";
 
 export const Route = createFileRoute("/livetrack/fleet/$fleetId")({
   component: RouteComponent,
@@ -275,10 +276,12 @@ function loadLeaflet() {
 function LiveRouteMap({
   stops,
   nextStopId,
+  shapePoints,
   visible,
 }: {
   stops: readonly StopWithCoords[];
   nextStopId: string | null;
+  shapePoints: ShapePoint[];
   visible: boolean;
 }) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -409,19 +412,29 @@ function LiveRouteMap({
       }
     });
 
+    // Coordinates for shape path (if provided)
+    const shapeCoords = shapePoints
+      .filter(
+        (p: ShapePoint) =>
+          typeof p.lat === "number" && typeof p.lon === "number",
+      )
+      .sort((a: ShapePoint, b: ShapePoint) => a.sequence - b.sequence)
+      .map((p: ShapePoint) => [p.lat, p.lon] as [number, number]);
+
     // Update or create polyline
-    if (coordsList.length > 1) {
+    const polyCoordsToUse = shapeCoords.length > 1 ? shapeCoords : coordsList;
+    if (polyCoordsToUse.length > 1) {
       if (polylineRef.current) {
-        polylineRef.current.setLatLngs(coordsList);
+        polylineRef.current.setLatLngs(polyCoordsToUse);
       } else {
-        polylineRef.current = L.polyline(coordsList, { color: "blue" }).addTo(
-          layerGroup,
-        );
+        polylineRef.current = L.polyline(polyCoordsToUse, {
+          color: "blue",
+        }).addTo(layerGroup);
       }
     }
 
     console.timeEnd("markers-update");
-  }, [stops, nextStopId, visible]);
+  }, [stops, nextStopId, shapePoints, visible]);
 
   /* --------------------------------------------------
    * Handle visibility changes – invalidate map size and perform initial fit
@@ -524,6 +537,13 @@ function RouteComponent() {
     }
   }, [coordsFetching]);
 
+  const firstStopId = trip?.stops[0]?.stopNumber ?? null;
+
+  const { shapePoints } = useShapeFromLiveStop(firstStopId, {
+    enabled: !!firstStopId,
+    refetchInterval: 30000,
+  });
+
   // Loading state
   if (isLoading) {
     return <div className="p-8 text-center">Loading live trip data…</div>;
@@ -617,6 +637,7 @@ function RouteComponent() {
                   <LiveRouteMap
                     stops={stopsWithCoords}
                     nextStopId={nextStop?.stopNumber ?? null}
+                    shapePoints={shapePoints}
                     visible={activeTab === "map"}
                   />
                 )}

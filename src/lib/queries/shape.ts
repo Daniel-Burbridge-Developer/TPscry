@@ -9,3 +9,12 @@ export const shapeByIdQuery = (shapeId: string | number) =>
         responseSchema: ShapeSelectZodSchema,
       }),
   }) as const;
+
+export const shapeByTripQuery = (tripId: string) =>
+  ({
+    queryKey: ["shape", "byTrip", tripId],
+    queryFn: (): Promise<Shape> =>
+      apiFetch(`/api/trip/${tripId}/shape`, undefined, {
+        responseSchema: ShapeSelectZodSchema,
+      }),
+  }) as const;
