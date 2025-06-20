@@ -252,7 +252,15 @@ function LiveRouteMap({
 }) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
+  const leafletRef = useRef<any>(null); // cached Leaflet module
 
+  // Keep track of layers we add so we can update them efficiently
+  const routeLayerRef = useRef<any>(null);
+  const didInitialFitRef = useRef(false);
+
+  /* --------------------------------------------------
+   * Map initialisation – only runs once
+   * ------------------------------------------------*/
   useEffect(() => {
     if (typeof window === "undefined") return; // SSR safeguard
 
@@ -276,21 +284,12 @@ function LiveRouteMap({
 
       if (isCancelled || !mapContainerRef.current) return;
 
-      // Clean up previous instance if re-rendering
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
+      leafletRef.current = L;
 
-      // Collect coordinates
-      const coordsList = stops
-        .filter((s) => typeof s.lat === "number" && typeof s.lon === "number")
-        .map((s) => [s.lat as number, s.lon as number] as [number, number]);
+      // Fallback centre – Perth
+      const defaultCenter: [number, number] = [-31.9523, 115.8613];
 
-      const defaultCenter: [number, number] = coordsList[0] ?? [
-        -31.9523, 115.8613,
-      ]; // Perth
-
+      // Create the map instance once
       const map = L.map(mapContainerRef.current).setView(defaultCenter, 13);
       mapInstanceRef.current = map;
 
@@ -299,50 +298,81 @@ function LiveRouteMap({
         maxZoom: 19,
       }).addTo(map);
 
-      const markerIcon = L.icon({
-        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-        shadowUrl:
-          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-      });
-
-      coordsList.forEach((coords, idx) => {
-        const stop = stops[idx];
-        const isCurrent = stop.stopNumber === nextStopId;
-
-        const icon = isCurrent
-          ? L.icon({
-              iconUrl:
-                "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-              shadowUrl:
-                "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-              iconSize: [25, 41],
-              iconAnchor: [12, 41],
-              className: "current-stop-marker",
-            })
-          : markerIcon;
-
-        L.marker(coords, { icon, title: stop.stopName })
-          .addTo(map)
-          .bindPopup(
-            `${stop.stopName}<br/>${isCurrent ? "Current Stop" : stop.status === "Departed" ? "Completed" : "Upcoming"}$${stop.delayMinutes > 0 ? ` (+${stop.delayMinutes} min)` : ""}`,
-          );
-      });
-
-      if (coordsList.length > 1) {
-        L.polyline(coordsList, { color: "blue" }).addTo(map);
-        map.fitBounds(L.latLngBounds(coordsList), { padding: [20, 20] });
-      }
+      // Prepare layer group for route overlays (markers, polyline)
+      routeLayerRef.current = L.layerGroup().addTo(map);
     })();
 
     return () => {
       isCancelled = true;
+      // Clean up map on unmount
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
       }
     };
+  }, []);
+
+  /* --------------------------------------------------
+   * Update overlays when stops / nextStopId change
+   * ------------------------------------------------*/
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapInstanceRef.current;
+    const layerGroup = routeLayerRef.current;
+
+    if (!L || !map || !layerGroup) return;
+
+    // Clear existing overlays
+    layerGroup.clearLayers();
+
+    // Collect coordinates
+    const coordsList = stops
+      .filter((s) => typeof s.lat === "number" && typeof s.lon === "number")
+      .map((s) => [s.lat as number, s.lon as number] as [number, number]);
+
+    // Default (non-current) marker icon
+    const markerIcon = L.icon({
+      iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+      shadowUrl:
+        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+    });
+
+    // Add markers
+    coordsList.forEach((coords, idx) => {
+      const stop = stops[idx];
+      const isCurrent = stop.stopNumber === nextStopId;
+
+      const icon = isCurrent
+        ? L.icon({
+            iconUrl:
+              "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+            shadowUrl:
+              "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            className: "current-stop-marker",
+          })
+        : markerIcon;
+
+      const marker = L.marker(coords, { icon, title: stop.stopName }).bindPopup(
+        `${stop.stopName}<br/>${isCurrent ? "Current Stop" : stop.status === "Departed" ? "Completed" : "Upcoming"}$${stop.delayMinutes > 0 ? ` (+${stop.delayMinutes} min)` : ""}`,
+      );
+      marker.addTo(layerGroup);
+    });
+
+    // Add polyline & optionally fit bounds on first render
+    if (coordsList.length > 1) {
+      const line = L.polyline(coordsList, { color: "blue" });
+      line.addTo(layerGroup);
+
+      // Only auto-fit once to avoid jitter when data updates
+      if (!didInitialFitRef.current) {
+        map.fitBounds(L.latLngBounds(coordsList), { padding: [20, 20] });
+        didInitialFitRef.current = true;
+      }
+    }
   }, [stops, nextStopId]);
 
   return (
