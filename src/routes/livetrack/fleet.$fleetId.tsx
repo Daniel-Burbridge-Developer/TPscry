@@ -244,12 +244,42 @@ type StopWithCoords = {
   lon?: number;
 };
 
+/* --------------------------------------------------
+ * Shared helper to load the Leaflet bundle & CSS exactly once
+ * ------------------------------------------------*/
+let leafletPromise: Promise<any> | null = null;
+
+function loadLeaflet() {
+  if (leafletPromise) return leafletPromise;
+  if (typeof window === "undefined") {
+    leafletPromise = Promise.reject(new Error("Leaflet cannot load on server"));
+    return leafletPromise;
+  }
+  leafletPromise = Promise.all([
+    // @ts-ignore – leaflet types not installed yet
+    import(/* @vite-ignore */ "leaflet"),
+    // Ensure CSS is present
+    new Promise((res) => {
+      if (document.getElementById("leaflet-style")) return res(null);
+      const link = document.createElement("link");
+      link.id = "leaflet-style";
+      link.rel = "stylesheet";
+      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+      document.head.appendChild(link);
+      link.onload = () => res(null);
+    }),
+  ]).then(([{ default: L }]) => L);
+  return leafletPromise;
+}
+
 function LiveRouteMap({
   stops,
   nextStopId,
+  visible,
 }: {
   stops: readonly StopWithCoords[];
   nextStopId: string | null;
+  visible: boolean;
 }) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -257,6 +287,8 @@ function LiveRouteMap({
 
   // Keep track of layers we add so we can update them efficiently
   const routeLayerRef = useRef<any>(null);
+  const markerMapRef = useRef<Record<string, any>>({}); // stopNumber -> marker
+  const polylineRef = useRef<any>(null);
   const didInitialFitRef = useRef(false);
 
   /* --------------------------------------------------
@@ -268,20 +300,7 @@ function LiveRouteMap({
     let isCancelled = false;
 
     (async () => {
-      const [{ default: L }] = await Promise.all([
-        // @ts-ignore – leaflet types not installed yet
-        import(/* @vite-ignore */ "leaflet"),
-        // ensure Leaflet CSS once
-        new Promise((res) => {
-          if (document.getElementById("leaflet-style")) return res(null);
-          const link = document.createElement("link");
-          link.id = "leaflet-style";
-          link.rel = "stylesheet";
-          link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-          document.head.appendChild(link);
-          link.onload = () => res(null);
-        }),
-      ]);
+      const L = await loadLeaflet();
 
       if (isCancelled || !mapContainerRef.current) return;
 
@@ -317,47 +336,44 @@ function LiveRouteMap({
    * Update overlays when stops / nextStopId change
    * ------------------------------------------------*/
   useEffect(() => {
+    console.time("markers-update");
     const L = leafletRef.current;
     const map = mapInstanceRef.current;
     const layerGroup = routeLayerRef.current;
 
     if (!L || !map || !layerGroup) return;
 
-    // Clear existing overlays
-    layerGroup.clearLayers();
+    // Collect coordinates for stops with valid lat/lon
+    const coordsList: [number, number][] = [];
 
-    // Collect coordinates
-    const coordsList = stops
-      .filter((s) => typeof s.lat === "number" && typeof s.lon === "number")
-      .map((s) => [s.lat as number, s.lon as number] as [number, number]);
+    stops.forEach((stop) => {
+      if (typeof stop.lat !== "number" || typeof stop.lon !== "number") return;
+      coordsList.push([stop.lat, stop.lon]);
 
-    // Default (non-current) marker icon
-    const markerIcon = L.icon({
-      iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-      shadowUrl:
-        "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-    });
+      const existingMarker = markerMapRef.current[stop.stopNumber];
 
-    // Add markers
-    coordsList.forEach((coords, idx) => {
-      const stop = stops[idx];
       const isCurrent = stop.stopNumber === nextStopId;
 
-      const icon = isCurrent
-        ? L.icon({
-            iconUrl:
-              "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-            shadowUrl:
-              "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            className: "current-stop-marker",
-          })
-        : markerIcon;
+      const baseIcon = L.icon({
+        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+      });
 
-      // Build informative popup content
+      const currentIcon = L.icon({
+        iconUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        className: "current-stop-marker",
+      });
+
+      const icon = isCurrent ? currentIcon : baseIcon;
+
       const timeLabel =
         stop.status === "Departed"
           ? `Departed: ${stop.time}`
@@ -371,24 +387,67 @@ function LiveRouteMap({
           : "Upcoming";
       const popupHtml = `${stop.stopName}<br/>${timeLabel}${delayLabel}<br/>${statusLabel}`;
 
-      const marker = L.marker(coords, { icon, title: stop.stopName }).bindPopup(
-        popupHtml,
-      );
-      marker.addTo(layerGroup);
+      if (existingMarker) {
+        // Update icon & popup content if needed
+        existingMarker.setIcon(icon);
+        existingMarker.setPopupContent(popupHtml);
+      } else {
+        const marker = L.marker([stop.lat, stop.lon], {
+          icon,
+          title: stop.stopName,
+        }).bindPopup(popupHtml);
+        marker.addTo(layerGroup);
+        markerMapRef.current[stop.stopNumber] = marker;
+      }
     });
 
-    // Add polyline & optionally fit bounds on first render
-    if (coordsList.length > 1) {
-      const line = L.polyline(coordsList, { color: "blue" });
-      line.addTo(layerGroup);
+    // Remove markers that are no longer in stops
+    Object.keys(markerMapRef.current).forEach((stopNumber) => {
+      if (!stops.find((s) => s.stopNumber === stopNumber)) {
+        markerMapRef.current[stopNumber].remove();
+        delete markerMapRef.current[stopNumber];
+      }
+    });
 
-      // Only auto-fit once to avoid jitter when data updates
-      if (!didInitialFitRef.current) {
-        map.fitBounds(L.latLngBounds(coordsList), { padding: [20, 20] });
-        didInitialFitRef.current = true;
+    // Update or create polyline
+    if (coordsList.length > 1) {
+      if (polylineRef.current) {
+        polylineRef.current.setLatLngs(coordsList);
+      } else {
+        polylineRef.current = L.polyline(coordsList, { color: "blue" }).addTo(
+          layerGroup,
+        );
       }
     }
-  }, [stops, nextStopId]);
+
+    console.timeEnd("markers-update");
+  }, [stops, nextStopId, visible]);
+
+  /* --------------------------------------------------
+   * Handle visibility changes – invalidate map size and perform initial fit
+   * ------------------------------------------------*/
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapInstanceRef.current;
+    if (visible && map && L) {
+      // Wait a tick to ensure container layout and markers ready
+      setTimeout(() => {
+        map.invalidateSize();
+
+        if (!didInitialFitRef.current) {
+          const latLngs = Object.values(markerMapRef.current).map((m) =>
+            m.getLatLng(),
+          );
+          if (latLngs.length === 1) {
+            map.setView(latLngs[0], 15);
+          } else if (latLngs.length > 1) {
+            map.fitBounds(L.latLngBounds(latLngs), { padding: [20, 20] });
+          }
+          didInitialFitRef.current = true;
+        }
+      }, 120);
+    }
+  }, [visible]);
 
   return (
     <div
@@ -403,6 +462,14 @@ function LiveRouteMap({
  * ------------------------------------------------*/
 function RouteComponent() {
   const { fleetId } = Route.useParams();
+
+  // Kick-off Leaflet preload as soon as this page mounts (client-side)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      // Fire and forget
+      loadLeaflet().catch(() => {});
+    }
+  }, []);
 
   const {
     data: trip,
@@ -439,6 +506,23 @@ function RouteComponent() {
       lon: firstMatch?.lon,
     } as StopWithCoords;
   });
+
+  // Determine if any of the coordinate queries are still loading/fetching
+  const coordsFetching = coordQueries.some((q) => q.isFetching);
+
+  // Prevent quick flicker: keep skeleton visible for at least ~400 ms after fetching finishes
+  const [showCoordsSkeleton, setShowCoordsSkeleton] = useState(true);
+
+  useEffect(() => {
+    if (coordsFetching) {
+      // Still fetching – ensure skeleton is shown
+      setShowCoordsSkeleton(true);
+    } else {
+      // All done – hide skeleton after a brief delay
+      const timeout = setTimeout(() => setShowCoordsSkeleton(false), 400);
+      return () => clearTimeout(timeout);
+    }
+  }, [coordsFetching]);
 
   // Loading state
   if (isLoading) {
@@ -517,22 +601,27 @@ function RouteComponent() {
             </div>
 
             {/* Tab content */}
-            {activeTab === "full" && (
-              <div className="mt-4 sm:mt-6">
+            {/* Always mount both views; hide the inactive one to preserve state */}
+            <div className="mt-4 sm:mt-6">
+              <div className={cn(activeTab === "full" ? "block" : "hidden")}>
                 <FullRouteView
                   stops={stopsWithDelay}
                   nextStopId={nextStop?.stopNumber ?? null}
                 />
               </div>
-            )}
-            {activeTab === "map" && (
-              <div className="mt-4 sm:mt-6">
-                <LiveRouteMap
-                  stops={stopsWithCoords}
-                  nextStopId={nextStop?.stopNumber ?? null}
-                />
+
+              <div className={cn(activeTab === "map" ? "block" : "hidden")}>
+                {showCoordsSkeleton ? (
+                  <div className="h-96 w-full animate-pulse rounded-md border border-muted bg-muted/40" />
+                ) : (
+                  <LiveRouteMap
+                    stops={stopsWithCoords}
+                    nextStopId={nextStop?.stopNumber ?? null}
+                    visible={activeTab === "map"}
+                  />
+                )}
               </div>
-            )}
+            </div>
           </CardContent>
         </Card>
       </div>
