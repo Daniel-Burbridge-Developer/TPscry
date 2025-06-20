@@ -245,6 +245,12 @@ type StopWithCoords = {
   lon?: number;
 };
 
+type ShapePoint = {
+  lat: number;
+  lon: number;
+  sequence: number;
+};
+
 /* --------------------------------------------------
  * Shared helper to load the Leaflet bundle & CSS exactly once
  * ------------------------------------------------*/
@@ -541,7 +547,7 @@ function RouteComponent() {
 
   const { shapePoints } = useShapeFromLiveStop(
     firstStopId,
-    trip.routeNumber ?? null,
+    trip?.routeNumber ?? null,
     {
       enabled: !!firstStopId,
       refetchInterval: 30000,
@@ -641,7 +647,14 @@ function RouteComponent() {
                   <LiveRouteMap
                     stops={stopsWithCoords}
                     nextStopId={nextStop?.stopNumber ?? null}
-                    shapePoints={shapePoints}
+                    shapePoints={shapePoints.map(
+                      ({ lat, lon, Sequence, ...rest }) => ({
+                        lat,
+                        lon,
+                        sequence: Sequence,
+                        ...rest,
+                      }),
+                    )}
                     visible={activeTab === "map"}
                   />
                 )}
