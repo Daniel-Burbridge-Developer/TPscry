@@ -7,6 +7,8 @@ import {
 } from "../ui/collapsible";
 import { useRouteTripsQuery } from "~/hooks/useRouteTripsQuery";
 import TripResultCard from "./TripResultCard";
+import { Badge } from "~/components/ui/badge";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 interface RouteResultItemProps {
   route: RouteType;
@@ -47,16 +49,31 @@ export const RouteResultItem = ({ route }: RouteResultItemProps) => {
     >
       <div className="rounded-lg border transition-colors hover:bg-gray-50 dark:hover:bg-gray-800">
         <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between rounded-lg p-2 dark:bg-gray-900">
-            <span className="font-medium">{`BUS ${routeName} - ${route.id}`}</span>
-            <span className="ml-4 text-xs text-gray-500 dark:text-gray-400">
-              {`BUS ${routeName} (${route.id})`}
-            </span>
-            {totalLiveTrips > 0 && (
-              <span className="ml-auto text-xs font-semibold text-green-600 dark:text-green-400">
-                {totalLiveTrips} live
-              </span>
-            )}
+          <div className="flex cursor-pointer items-center justify-between p-3 sm:p-4">
+            <div className="flex items-center gap-3">
+              <h3 className="text-base font-semibold sm:text-lg">
+                Route {routeName}
+              </h3>
+              {trips && (
+                <Badge variant="outline" className="text-xs">
+                  {trips.length} route{trips.length !== 1 ? "s" : ""}
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {totalLiveTrips > 0 && (
+                <div className="hidden text-right sm:block">
+                  <div className="text-sm text-gray-500">
+                    {totalLiveTrips} live
+                  </div>
+                </div>
+              )}
+              {isExpanded ? (
+                <ChevronUp className="h-4 w-4 text-gray-500" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              )}
+            </div>
           </div>
         </CollapsibleTrigger>
         <CollapsibleContent forceMount>
