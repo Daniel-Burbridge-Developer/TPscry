@@ -53,7 +53,14 @@ export const ServerRoute = createServerFileRoute(
       const validatedStops = StopSelectZodSchema.array().parse(matchingStops);
       console.log("🔍 Validated stops:", validatedStops.length);
 
-      return json(validatedStops || []);
+      return json(validatedStops || [], {
+        headers: {
+          // Cache at the edge for one day and serve stale while revalidating
+          // to avoid counting additional function invocations for identical
+          // search terms within that window.
+          "Cache-Control": "s-maxage=86400, stale-while-revalidate=86400",
+        },
+      });
     } catch (error) {
       console.error("❌ Error searching stops:", error);
       return json({ error: "Internal server error" }, { status: 500 });

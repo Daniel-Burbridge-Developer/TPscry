@@ -10,7 +10,7 @@ interface DebouncedSearchTerms extends SearchTerms {}
 
 type RecentSearchTerms = Record<keyof SearchTerms, string[]>;
 
-const DEBOUNCE_MS = 300;
+const DEBOUNCE_MS = 500;
 
 const debounceTimers: Partial<
   Record<keyof SearchTerms, ReturnType<typeof setTimeout>>
