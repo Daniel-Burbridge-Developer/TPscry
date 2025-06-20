@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { Trip } from '~/schemas/index';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getExternalStopDataQuery } from '~/lib/queries/externalStopData';
-import { ExternalStopData } from '~/schemas/externalStopDataSchema';
+import { useMemo } from "react";
+import { Trip } from "~/schemas/index";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getExternalStopDataQuery } from "~/lib/queries/externalStopData";
+import { ExternalStopData } from "~/schemas/externalStopDataSchema";
 
 interface UseTripLiveStatusOptions {
   pollingIntervalMs?: number;
@@ -25,7 +25,7 @@ export const useTripLiveStatus = (
   const queryClient = useQueryClient();
 
   const queryResult = useQuery<{ isLive: boolean; fleetId: string | null }>({
-    queryKey: ['trip-live-status', trip.id, routeName, trip.tripHeadsign],
+    queryKey: ["trip-live-status", trip.id, routeName, trip.tripHeadsign],
     queryFn: async () => {
       for (const stopId of stopIds) {
         if (!stopId) continue;

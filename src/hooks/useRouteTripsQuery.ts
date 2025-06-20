@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { tripsByRouteQuery } from '~/lib/queries/trips';
+import { useQuery } from "@tanstack/react-query";
+import { tripsByRouteQuery } from "~/lib/queries/trips";
 
 export const useRouteTripsQuery = (
   routeId: string,

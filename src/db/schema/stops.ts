@@ -18,7 +18,7 @@ export const stops = pgTable(
     // Change supported_modes to jsonb to store an array of strings
     supportedModes: jsonb("supported_modes").$type<string[]>(),
   },
-  (stops) => [index("name_idx").on(stops.name)]
+  (stops) => [index("name_idx").on(stops.name)],
 );
 
 export type Stop = typeof stops.$inferSelect;

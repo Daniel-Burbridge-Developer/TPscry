@@ -1,7 +1,9 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface SearchTerms {
   routes: string;
+  trips: string;
+  stops: string;
 }
 
 interface DebouncedSearchTerms extends SearchTerms {}
@@ -23,13 +25,19 @@ interface SearchStoreState {
 
 export const useSearchStore = create<SearchStoreState>((set, get) => ({
   searchTerms: {
-    routes: '',
+    routes: "",
+    trips: "",
+    stops: "",
   },
   debouncedSearchTerms: {
-    routes: '',
+    routes: "",
+    trips: "",
+    stops: "",
   },
   recentSearchTerms: {
     routes: [],
+    trips: [],
+    stops: [],
   },
 
   setSearchTerm: (type, term) => {

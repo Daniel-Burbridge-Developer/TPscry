@@ -1,4 +1,4 @@
-import { z, ZodError } from 'zod';
+import { z, ZodError } from "zod";
 
 interface RequestPayload {
   [key: string]: unknown;
@@ -17,7 +17,7 @@ export const apiFetch = async <T>(
   data?: RequestPayload,
   options: ApiFetchOptions = {},
 ): Promise<T> => {
-  const method = options.method?.toUpperCase() || 'GET';
+  const method = options.method?.toUpperCase() || "GET";
   const fullUrl = url;
 
   const effectiveCacheLifetime =
@@ -26,7 +26,7 @@ export const apiFetch = async <T>(
       : DEFAULT_CACHE_LIFETIME_MS;
 
   // 1. Handle Caching for GET requests
-  if (method === 'GET' && effectiveCacheLifetime > 0) {
+  if (method === "GET" && effectiveCacheLifetime > 0) {
     const cachedEntry = cache.get(fullUrl);
     if (
       cachedEntry &&
@@ -56,15 +56,15 @@ export const apiFetch = async <T>(
 
   // 2. Prepare Headers
   const headers: Record<string, string> = {
-    Accept: 'application/json',
+    Accept: "application/json",
     ...((options.headers as Record<string, string>) || {}),
   };
 
   // 3. Prepare the request body
   let requestBody: BodyInit | undefined;
   if (data) {
-    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-      headers['Content-Type'] = 'application/json';
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+      headers["Content-Type"] = "application/json";
       requestBody = JSON.stringify(data);
     } else {
       console.warn(
@@ -92,7 +92,7 @@ export const apiFetch = async <T>(
         const errorData = await res.json();
         if (errorData && errorData.message) {
           errorMessage = `API error (${res.status}): ${errorData.message}`;
-        } else if (typeof errorData === 'string') {
+        } else if (typeof errorData === "string") {
           errorMessage = `API error (${res.status}): ${errorData}`;
         }
       } catch (e) {
@@ -127,7 +127,7 @@ export const apiFetch = async <T>(
     }
 
     // 7. Cache Validated Response (for GET requests)
-    if (method === 'GET' && effectiveCacheLifetime > 0) {
+    if (method === "GET" && effectiveCacheLifetime > 0) {
       cache.set(fullUrl, { data: validatedData, timestamp: Date.now() });
       console.log(
         `Cached new data for: ${fullUrl} (TTL: ${effectiveCacheLifetime / 1000}s)`,

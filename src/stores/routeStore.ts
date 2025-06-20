@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface RouteStoreState {
   favouriteRouteIds: string[];
@@ -30,7 +30,7 @@ export const useRouteStore = create<RouteStoreState>()(
         }),
     }),
     {
-      name: 'route-store', // name of the item in storage
+      name: "route-store", // name of the item in storage
       partialize: (state) => ({ favouriteRouteIds: state.favouriteRouteIds }),
     },
   ),

@@ -1,7 +1,7 @@
-import { Star } from 'lucide-react';
-import type { MouseEvent } from 'react';
-import { useRouteStore } from '~/stores/routeStore';
-import { cn } from '~/lib/utils'; // If you don't have a cn utility, remove this and use className directly
+import { Star } from "lucide-react";
+import type { MouseEvent } from "react";
+import { useRouteStore } from "~/stores/routeStore";
+import { cn } from "~/lib/utils"; // If you don't have a cn utility, remove this and use className directly
 
 interface FavouriteToggleProps {
   routeId: string;
@@ -33,15 +33,15 @@ const FavouriteToggle = ({
   return (
     <button
       type="button"
-      aria-label={isFavourited ? 'Remove from favourites' : 'Add to favourites'}
+      aria-label={isFavourited ? "Remove from favourites" : "Add to favourites"}
       onClick={toggleFavourite}
-      className={cn('transition-colors', className)}
+      className={cn("transition-colors", className)}
       tabIndex={0}
     >
       <Star
         size={size}
-        className={`transition-colors ${isFavourited ? 'fill-yellow-400 text-yellow-500' : 'text-muted-foreground hover:text-yellow-500'}`}
-        fill={isFavourited ? '#facc15' : 'none'}
+        className={`transition-colors ${isFavourited ? "fill-yellow-400 text-yellow-500" : "text-muted-foreground hover:text-yellow-500"}`}
+        fill={isFavourited ? "#facc15" : "none"}
         strokeWidth={1.5}
       />
     </button>

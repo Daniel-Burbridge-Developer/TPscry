@@ -1,12 +1,12 @@
-import { json } from '@tanstack/react-start';
-import { createServerFileRoute } from '@tanstack/react-start/server';
-import { z } from 'zod';
-import * as cheerio from 'cheerio';
-import { corsMiddleware } from '~/lib/cors';
-import { ExternalStopDataSchema, ExternalStopData } from '~/schemas';
+import { json } from "@tanstack/react-start";
+import { createServerFileRoute } from "@tanstack/react-start/server";
+import { z } from "zod";
+import * as cheerio from "cheerio";
+import { corsMiddleware } from "~/lib/cors";
+import { ExternalStopDataSchema, ExternalStopData } from "~/schemas";
 
 // Validate `stopId` route param
-const stopIdSchema = z.string().min(1, 'stopId cannot be empty');
+const stopIdSchema = z.string().min(1, "stopId cannot be empty");
 
 // A very small in-memory cache to avoid hammering the Transperth real-time page
 const cache = new Map<
@@ -16,10 +16,10 @@ const cache = new Map<
 const CACHE_TTL_MS = 10 * 1000; // 10 seconds
 
 export const ServerRoute = createServerFileRoute(
-  '/api/stop/$stopId/externalStopData',
+  "/api/stop/$stopId/externalStopData",
 ).methods({
   GET: async ({ request, params }) => {
-    if (request.method === 'OPTIONS') {
+    if (request.method === "OPTIONS") {
       const corsResponse = corsMiddleware(request);
       if (corsResponse) return corsResponse;
     }
@@ -29,7 +29,7 @@ export const ServerRoute = createServerFileRoute(
         (params as { stopId: string }).stopId,
       );
       if (!parsedParams.success) {
-        return json({ error: 'Invalid stopId parameter' }, { status: 400 });
+        return json({ error: "Invalid stopId parameter" }, { status: 400 });
       }
 
       const stopId = parsedParams.data;
@@ -49,16 +49,16 @@ export const ServerRoute = createServerFileRoute(
 
       const rawHtml = await res.text();
       const $ = cheerio.load(rawHtml);
-      const timetableElement = $('#pnlStopTimetable');
+      const timetableElement = $("#pnlStopTimetable");
 
       if (timetableElement.length === 0) {
         return json(
-          { error: 'Failed to locate timetable information on page' },
+          { error: "Failed to locate timetable information on page" },
           { status: 502 },
         );
       }
 
-      const parsedRows = parseTimetableHtml(timetableElement.html() || '');
+      const parsedRows = parseTimetableHtml(timetableElement.html() || "");
 
       const validatedRows = ExternalStopDataSchema.array().parse(parsedRows);
 
@@ -66,8 +66,8 @@ export const ServerRoute = createServerFileRoute(
 
       return json(validatedRows);
     } catch (error) {
-      console.error('❌ Error in stop info route:', error);
-      return json({ error: 'Internal server error' }, { status: 500 });
+      console.error("❌ Error in stop info route:", error);
+      return json({ error: "Internal server error" }, { status: 500 });
     }
   },
 });
@@ -81,33 +81,33 @@ function parseTimetableHtml(html: string): ExternalStopData[] {
   const $ = cheerio.load(html);
   const rows: ExternalStopData[] = [];
 
-  $('.tpm_row_timetable').each((_, el) => {
+  $(".tpm_row_timetable").each((_, el) => {
     const row = $(el);
 
-    const tripId = row.data('tripid')?.toString() || '';
-    const fleetId = row.data('fleet')?.toString() || null;
+    const tripId = row.data("tripid")?.toString() || "";
+    const fleetId = row.data("fleet")?.toString() || null;
 
     const liveStatus =
-      row.find('.tt-livetext').text().trim().toUpperCase() === 'LIVE';
+      row.find(".tt-livetext").text().trim().toUpperCase() === "LIVE";
 
-    const busNumber = row.children('div').eq(0).find('span').text().trim();
+    const busNumber = row.children("div").eq(0).find("span").text().trim();
 
     const timeUntilArrival = row
-      .children('div')
+      .children("div")
       .eq(2)
-      .find('strong')
+      .find("strong")
       .text()
       .trim();
 
     let destination = row
-      .children('div')
+      .children("div")
       .eq(1)
-      .find('.route-display-name')
+      .find(".route-display-name")
       .first()
       .text()
       .trim();
 
-    if (destination.toLowerCase().startsWith('to ')) {
+    if (destination.toLowerCase().startsWith("to ")) {
       destination = destination.substring(3).trim();
     }
 

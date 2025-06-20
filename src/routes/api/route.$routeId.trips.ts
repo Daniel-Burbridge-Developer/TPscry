@@ -1,9 +1,9 @@
-import { json } from '@tanstack/react-start';
-import { createServerFileRoute } from '@tanstack/react-start/server';
-import { db } from '~/db';
-import { TripSelectZodSchema, TripStop } from '~/schemas/tripSchema';
-import { sql } from 'drizzle-orm';
-import { corsMiddleware } from '~/lib/cors';
+import { json } from "@tanstack/react-start";
+import { createServerFileRoute } from "@tanstack/react-start/server";
+import { db } from "~/db";
+import { TripSelectZodSchema, TripStop } from "~/schemas/tripSchema";
+import { sql } from "drizzle-orm";
+import { corsMiddleware } from "~/lib/cors";
 
 // This type is only used internally to type the raw SQL query result.
 // The actual API response is validated by TripSelectZodSchema,
@@ -19,24 +19,24 @@ type TripRecord = {
 };
 
 export const ServerRoute = createServerFileRoute(
-  '/api/route/$routeId/trips',
+  "/api/route/$routeId/trips",
 ).methods({
   GET: async ({ request, params }) => {
-    console.log('🚌 Trips route called with params:', params);
-    console.log('🚌 Request URL:', request.url);
+    console.log("🚌 Trips route called with params:", params);
+    console.log("🚌 Request URL:", request.url);
 
     // Handle CORS only for OPTIONS requests
-    if (request.method === 'OPTIONS') {
-      console.log('🚌 Handling OPTIONS request');
+    if (request.method === "OPTIONS") {
+      console.log("🚌 Handling OPTIONS request");
       const corsResponse = corsMiddleware(request);
       if (corsResponse) {
-        console.log('🚌 Returning CORS response');
+        console.log("🚌 Returning CORS response");
         return corsResponse;
       }
     }
 
     try {
-      console.log('🚌 Fetching trips for routeId:', params.routeId);
+      console.log("🚌 Fetching trips for routeId:", params.routeId);
 
       // Use a subquery with DISTINCT ON to get one trip per unique tripHeadsign
       const result = await db.execute<TripRecord>(sql`
@@ -48,12 +48,12 @@ export const ServerRoute = createServerFileRoute(
       `);
 
       const routeTrips = result.rows;
-      console.log('🚌 Found trips:', routeTrips.length);
+      console.log("🚌 Found trips:", routeTrips.length);
 
       if (!routeTrips.length) {
-        console.log('🚌 No trips found for routeId:', params.routeId);
+        console.log("🚌 No trips found for routeId:", params.routeId);
         return json(
-          { error: 'No trips found for this route' },
+          { error: "No trips found for this route" },
           { status: 404 },
         );
       }
@@ -68,26 +68,26 @@ export const ServerRoute = createServerFileRoute(
         shapeId: trip.shape_id,
         stops: ((trip.stops as TripStop[] | null) || []).map(
           (stop: Partial<TripStop>, index: number) => ({
-            id: stop.id || '',
-            arrivalTime: stop.arrivalTime || '',
+            id: stop.id || "",
+            arrivalTime: stop.arrivalTime || "",
             Sequence: stop.Sequence || index + 1, // Use index + 1 as fallback for Sequence
           }),
         ),
       }));
 
-      console.log('🚌 Trips with ensured stops:', tripsWithStops.length);
+      console.log("🚌 Trips with ensured stops:", tripsWithStops.length);
 
       // Validate trips against schema
       const validatedTrips = TripSelectZodSchema.array().parse(tripsWithStops);
-      console.log('🚌 Validated trips:', validatedTrips.length);
+      console.log("🚌 Validated trips:", validatedTrips.length);
 
       return json(validatedTrips);
     } catch (error) {
-      console.error('❌ Error fetching trips:', error);
+      console.error("❌ Error fetching trips:", error);
       if (error instanceof Error) {
-        console.error('❌ Validation error details:', error.message);
+        console.error("❌ Validation error details:", error.message);
       }
-      return json({ error: 'Internal server error' }, { status: 500 });
+      return json({ error: "Internal server error" }, { status: 500 });
     }
   },
 });

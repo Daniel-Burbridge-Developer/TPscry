@@ -1,27 +1,27 @@
-import { json } from '@tanstack/react-start';
-import { createServerFileRoute } from '@tanstack/react-start/server';
-import { z } from 'zod';
-import * as cheerio from 'cheerio';
-import { corsMiddleware } from '~/lib/cors';
+import { json } from "@tanstack/react-start";
+import { createServerFileRoute } from "@tanstack/react-start/server";
+import { z } from "zod";
+import * as cheerio from "cheerio";
+import { corsMiddleware } from "~/lib/cors";
 import {
   TripLiveDetailsSchema,
   TripLiveDetails,
   LiveTripStop,
-} from '~/schemas/tripLiveDetailsSchema';
+} from "~/schemas/tripLiveDetailsSchema";
 
 // Validate the dynamic route param
-const fleetNumberSchema = z.string().min(1, 'fleetNumber cannot be empty');
+const fleetNumberSchema = z.string().min(1, "fleetNumber cannot be empty");
 
 // Small in-memory cache (aligns with 10 s TTL used elsewhere)
 const cache = new Map<string, { data: TripLiveDetails; timestamp: number }>();
 const CACHE_TTL_MS = 10 * 1000;
 
 export const ServerRoute = createServerFileRoute(
-  '/api/fleet/$fleetId/externalLiveTrack',
+  "/api/fleet/$fleetId/externalLiveTrack",
 ).methods({
   GET: async ({ request, params }) => {
     // Handle CORS pre-flight requests (browser sends OPTIONS)
-    if (request.method === 'OPTIONS') {
+    if (request.method === "OPTIONS") {
       const corsResponse = corsMiddleware(request);
       if (corsResponse) return corsResponse;
     }
@@ -31,7 +31,7 @@ export const ServerRoute = createServerFileRoute(
         (params as { fleetId: string }).fleetId,
       );
       if (!parsedId.success) {
-        return json({ error: 'Invalid fleetId parameter' }, { status: 400 });
+        return json({ error: "Invalid fleetId parameter" }, { status: 400 });
       }
 
       const fleetId = parsedId.data.toLowerCase();
@@ -47,7 +47,7 @@ export const ServerRoute = createServerFileRoute(
       const res = await fetch(externalUrl);
       if (!res.ok) {
         return json(
-          { error: 'Failed to fetch external page' },
+          { error: "Failed to fetch external page" },
           {
             status: res.status,
           },
@@ -64,8 +64,8 @@ export const ServerRoute = createServerFileRoute(
 
       return json({ data: validated });
     } catch (err) {
-      console.error('❌ Error in live-trip route:', err);
-      return json({ error: 'Internal server error' }, { status: 500 });
+      console.error("❌ Error in live-trip route:", err);
+      return json({ error: "Internal server error" }, { status: 500 });
     }
   },
 });
@@ -76,35 +76,35 @@ export const ServerRoute = createServerFileRoute(
 function parseLiveTripHtml(html: string): TripLiveDetails {
   const $ = cheerio.load(html);
 
-  const routeNumberText = $('#lblTripHeading').text().trim(); // e.g. "Route 584"
-  const routeNumber = routeNumberText.replace('Route ', '').trim() || null;
+  const routeNumberText = $("#lblTripHeading").text().trim(); // e.g. "Route 584"
+  const routeNumber = routeNumberText.replace("Route ", "").trim() || null;
 
-  const fleetNumberText = $('#lblTripHeading2').text().trim(); // e.g. " with bus 2615"
+  const fleetNumberText = $("#lblTripHeading2").text().trim(); // e.g. " with bus 2615"
   const associatedFleetNumber =
-    fleetNumberText.replace(' with bus ', '').trim() || null;
+    fleetNumberText.replace(" with bus ", "").trim() || null;
 
-  const serviceAlertLink = $('#interruption_link');
+  const serviceAlertLink = $("#interruption_link");
   const serviceAlert = serviceAlertLink.text().trim() || null;
 
   const stops: LiveTripStop[] = [];
-  $('#serverSideRenderList')
-    .find('.tpm_row_fleettrip_wrap')
+  $("#serverSideRenderList")
+    .find(".tpm_row_fleettrip_wrap")
     .each((_, el) => {
       const row = $(el);
 
-      const stopName = row.find('.service-stop-name').text().trim();
-      const stopNumberText = row.find('.service-stop-number').text().trim();
-      const stopNumber = stopNumberText.replace('Stop ', '').trim();
-      const time = row.find('.service-time').text().trim();
+      const stopName = row.find(".service-stop-name").text().trim();
+      const stopNumberText = row.find(".service-stop-number").text().trim();
+      const stopNumber = stopNumberText.replace("Stop ", "").trim();
+      const time = row.find(".service-time").text().trim();
 
-      let status = 'Unknown';
-      if (row.hasClass('Departed')) {
-        status = 'Departed';
-      } else if (row.hasClass('Predicted')) {
-        status = 'Predicted';
+      let status = "Unknown";
+      if (row.hasClass("Departed")) {
+        status = "Departed";
+      } else if (row.hasClass("Predicted")) {
+        status = "Predicted";
       } else {
-        const statusFlag = row.find('.service-status-flag').text().trim();
-        if (statusFlag) status = statusFlag.replace(/[()]/g, '').trim();
+        const statusFlag = row.find(".service-status-flag").text().trim();
+        if (statusFlag) status = statusFlag.replace(/[()]/g, "").trim();
       }
 
       if (stopName && stopNumber && time) {

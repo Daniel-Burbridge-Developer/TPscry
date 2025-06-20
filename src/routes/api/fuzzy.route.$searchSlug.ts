@@ -1,34 +1,34 @@
-import { json } from '@tanstack/react-start';
-import { createServerFileRoute } from '@tanstack/react-start/server';
-import { db } from '~/db';
-import { routes } from '~/db/schema/routes';
-import { routeSchema } from '~/schemas/routeSchema';
-import { corsMiddleware } from '~/lib/cors';
-import { ilike, or } from 'drizzle-orm';
+import { json } from "@tanstack/react-start";
+import { createServerFileRoute } from "@tanstack/react-start/server";
+import { db } from "~/db";
+import { routes } from "~/db/schema/routes";
+import { routeSchema } from "~/schemas/routeSchema";
+import { corsMiddleware } from "~/lib/cors";
+import { ilike, or } from "drizzle-orm";
 
 export const ServerRoute = createServerFileRoute(
-  '/api/fuzzy/route/$searchSlug',
+  "/api/fuzzy/route/$searchSlug",
 ).methods({
   GET: async ({ request, params }) => {
-    console.log('🔍 Fuzzy route search called with params:', params);
-    console.log('🔍 Request URL:', request.url);
+    console.log("🔍 Fuzzy route search called with params:", params);
+    console.log("🔍 Request URL:", request.url);
 
     // Handle CORS only for OPTIONS requests
-    if (request.method === 'OPTIONS') {
-      console.log('🔍 Handling OPTIONS request');
+    if (request.method === "OPTIONS") {
+      console.log("🔍 Handling OPTIONS request");
       const corsResponse = corsMiddleware(request);
       if (corsResponse) {
-        console.log('🔍 Returning CORS response');
+        console.log("🔍 Returning CORS response");
         return corsResponse;
       }
     }
 
     try {
       const searchTerm = `%${params.searchSlug}%`;
-      console.log('🔍 Search term:', searchTerm);
+      console.log("🔍 Search term:", searchTerm);
 
       // Search in both shortName and longName
-      console.log('🔍 Executing database query...');
+      console.log("🔍 Executing database query...");
       const matchingRoutes = await db
         .select({
           id: routes.id,
@@ -46,16 +46,16 @@ export const ServerRoute = createServerFileRoute(
         )
         .limit(5);
 
-      console.log('🔍 Found routes:', matchingRoutes.length);
+      console.log("🔍 Found routes:", matchingRoutes.length);
 
       // Validate routes against schema
       const validatedRoutes = routeSchema.array().parse(matchingRoutes);
-      console.log('🔍 Validated routes:', validatedRoutes.length);
+      console.log("🔍 Validated routes:", validatedRoutes.length);
 
-      return json(validatedRoutes);
+      return json(validatedRoutes || []);
     } catch (error) {
-      console.error('❌ Error searching routes:', error);
-      return json({ error: 'Internal server error' }, { status: 500 });
+      console.error("❌ Error searching routes:", error);
+      return json({ error: "Internal server error" }, { status: 500 });
     }
   },
 });
