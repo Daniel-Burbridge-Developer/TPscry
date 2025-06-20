@@ -56,7 +56,7 @@ function Header({
   return (
     <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:gap-4">
       <Link
-        to=".."
+        to="/"
         className="self-start rounded-md border px-3 py-1 text-sm hover:bg-muted/50"
       >
         ← Back
@@ -369,7 +369,8 @@ function LiveRouteMap({
 
       const isCurrent = stop.stopNumber === nextStopId;
 
-      const baseIcon = L.icon({
+      // Blue icon for completed stops (default Leaflet)
+      const completedIcon = L.icon({
         iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
         shadowUrl:
           "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
@@ -377,17 +378,33 @@ function LiveRouteMap({
         iconAnchor: [12, 41],
       });
 
-      const currentIcon = L.icon({
+      // Grey icon for upcoming stops
+      const upcomingIcon = L.icon({
         iconUrl:
-          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+          "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png",
         shadowUrl:
           "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
         iconSize: [25, 41],
         iconAnchor: [12, 41],
-        className: "current-stop-marker",
       });
 
-      const icon = isCurrent ? currentIcon : baseIcon;
+      const currentIcon = L.icon({
+        // Orange variant from leaflet-color-markers
+        iconUrl:
+          "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-orange.png",
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+      });
+
+      const isCompleted = stop.status === "Departed" && !isCurrent;
+
+      const icon = isCurrent
+        ? currentIcon
+        : isCompleted
+          ? completedIcon
+          : upcomingIcon;
 
       const timeLabel =
         stop.status === "Departed"
