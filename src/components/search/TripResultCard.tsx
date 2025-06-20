@@ -27,7 +27,7 @@ const TripResultCard = ({
   const { isLive, fleetId } = useTripLiveStatus(trip, routeName);
 
   // Fetch more granular live-trip details (next stop + ETA) only when live and fleetId known
-  const { nextStop } = useTripLiveDetails(fleetId, {
+  const { delayMinutes, nextStop } = useTripLiveDetails(fleetId, {
     enabled: isLive && !!fleetId,
   });
 
@@ -46,7 +46,7 @@ const TripResultCard = ({
           <WifiOff className="h-4 w-4 text-gray-400" />
         )}
         <span className="text-sm font-medium sm:text-base">
-          {trip.tripHeadsign ?? "Unknown"}
+          To: {trip.tripHeadsign ?? "Unknown"}
         </span>
         <Badge variant={isLive ? "default" : "secondary"} className="text-xs">
           {isLive ? "Live" : "Offline"}
@@ -61,6 +61,11 @@ const TripResultCard = ({
           </div>
           <div className="text-xs text-gray-500">
             ETA: {nextStop?.time ?? "N/A"}
+            {delayMinutes > 0 && (
+              <span className="ml-1 font-semibold text-red-600 dark:text-red-400">
+                +{delayMinutes} min
+              </span>
+            )}
           </div>
         </div>
         <ChevronRight className="hidden h-4 w-4 text-gray-400 sm:block" />

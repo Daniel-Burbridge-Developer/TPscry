@@ -20,6 +20,7 @@ const TripCard = ({ trip, routeName }: TripCardProps) => {
     data: liveDetails,
     isLoading: liveLoading,
     currentStop,
+    stopsWithDelay,
   } = useTripLiveDetails(fleetId, {
     enabled: isLive && !!fleetId && isExpanded,
     pollingIntervalMs: 10000,
@@ -70,7 +71,7 @@ const TripCard = ({ trip, routeName }: TripCardProps) => {
           )}
           {liveDetails && (
             <LiveTripProgress
-              stops={liveDetails.stops}
+              stops={stopsWithDelay ?? liveDetails.stops}
               currentStopId={currentStop?.stopNumber}
             />
           )}

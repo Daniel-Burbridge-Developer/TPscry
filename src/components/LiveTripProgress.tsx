@@ -6,8 +6,10 @@ import type { LiveTripStop } from "~/schemas/tripLiveDetailsSchema";
 import { useTripProgress } from "~/hooks/useTripProgress";
 import { Bus, Check } from "lucide-react";
 
+type LiveTripStopWithDelay = LiveTripStop & { delayMinutes?: number };
+
 interface LiveTripProgressProps {
-  stops: LiveTripStop[];
+  stops: LiveTripStopWithDelay[];
   currentStopId?: string | null;
 }
 
@@ -41,7 +43,7 @@ const toSeconds = (t?: string | null): number => {
 
 // Helper to render delta string with additional status consideration
 const computeDelta = (
-  stop: LiveTripStop,
+  stop: LiveTripStopWithDelay,
   nowSeconds: number,
   boundFormat: (t?: string | null) => string,
 ): string => {
@@ -187,8 +189,7 @@ export const LiveTripProgress = ({
         {(isShortView ? displayedStops : stops).map((stop, idx) => {
           const realIdx = isShortView ? startIndex + idx : idx;
           const timeSec = toSeconds(stop.time);
-          const isDelayedStop =
-            stop.status === "Predicted" && nowSeconds > timeSec;
+          const isDelayedStop = stop.delayMinutes && stop.delayMinutes > 0;
           return (
             <div
               key={stop.stopNumber}
@@ -210,6 +211,7 @@ export const LiveTripProgress = ({
                   className={`block text-xs ${isDelayedStop ? "text-red-500" : "text-muted-foreground"}`}
                 >
                   {stop.time} {realIdx === currentIndex && "(Now)"}
+                  {isDelayedStop && ` (+${stop.delayMinutes} min)`}
                 </span>
                 <span
                   className={`text-xs ${isDelayedStop ? "text-red-500" : "text-muted-foreground"} block`}
