@@ -20,6 +20,7 @@ const fetchShape = async (shapeId: string | number): Promise<Shape> => {
 
 export const useShapeFromLiveStop = (
   stopId: string | null | undefined,
+  routeNumber: string | null | undefined,
   options?: { enabled?: boolean; refetchInterval?: number },
 ) => {
   // Query external stop data first
@@ -31,9 +32,14 @@ export const useShapeFromLiveStop = (
   // Derive live tripId (if any)
   const liveTripId = useMemo(() => {
     const rows = externalQuery.data ?? [];
-    const live = rows.find((r) => r.liveStatus && r.tripId);
+    const live = rows.find(
+      (r) =>
+        r.liveStatus &&
+        r.tripId &&
+        (!routeNumber || r.busNumber === routeNumber),
+    );
     return live?.tripId ?? null;
-  }, [externalQuery.data]);
+  }, [externalQuery.data, routeNumber]);
 
   // Trip query
   const tripQuery = useQuery({

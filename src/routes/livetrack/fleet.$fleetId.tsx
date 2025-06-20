@@ -539,10 +539,14 @@ function RouteComponent() {
 
   const firstStopId = trip?.stops[0]?.stopNumber ?? null;
 
-  const { shapePoints } = useShapeFromLiveStop(firstStopId, {
-    enabled: !!firstStopId,
-    refetchInterval: 30000,
-  });
+  const { shapePoints } = useShapeFromLiveStop(
+    firstStopId,
+    trip.routeNumber ?? null,
+    {
+      enabled: !!firstStopId,
+      refetchInterval: 30000,
+    },
+  );
 
   // Loading state
   if (isLoading) {
