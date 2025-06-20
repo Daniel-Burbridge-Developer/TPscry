@@ -284,11 +284,14 @@ function LiveRouteMap({
   nextStopId,
   shapePoints,
   visible,
+  progressPercent,
 }: {
   stops: readonly StopWithCoords[];
   nextStopId: string | null;
   shapePoints: ShapePoint[];
   visible: boolean;
+  /** Percentage of route completed (0–100) */
+  progressPercent: number;
 }) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -297,7 +300,10 @@ function LiveRouteMap({
   // Keep track of layers we add so we can update them efficiently
   const routeLayerRef = useRef<any>(null);
   const markerMapRef = useRef<Record<string, any>>({}); // stopNumber -> marker
-  const polylineRef = useRef<any>(null);
+  const polylineRef = useRef<{
+    completed: any | null;
+    upcoming: any | null;
+  } | null>(null);
   const didInitialFitRef = useRef(false);
 
   /* --------------------------------------------------
@@ -427,20 +433,56 @@ function LiveRouteMap({
       .sort((a: ShapePoint, b: ShapePoint) => a.sequence - b.sequence)
       .map((p: ShapePoint) => [p.lat, p.lon] as [number, number]);
 
-    // Update or create polyline
     const polyCoordsToUse = shapeCoords.length > 1 ? shapeCoords : coordsList;
-    if (polyCoordsToUse.length > 1) {
-      if (polylineRef.current) {
-        polylineRef.current.setLatLngs(polyCoordsToUse);
-      } else {
-        polylineRef.current = L.polyline(polyCoordsToUse, {
-          color: "blue",
-        }).addTo(layerGroup);
-      }
+
+    // ----- Split polyline into completed vs upcoming based on progressPercent -----
+    // Clamp progressPercent to [0,100]
+    const progress = Math.min(Math.max(progressPercent, 0), 100);
+
+    // Nothing to draw if we don't have at least two points
+    if (polyCoordsToUse.length < 2) return;
+
+    // Remove any existing polylines before drawing new ones
+    if (polylineRef.current) {
+      const { completed, upcoming } = polylineRef.current;
+      if (completed) completed.remove();
+      if (upcoming) upcoming.remove();
     }
 
+    // Determine split index along the coordinates array
+    const splitIdx = Math.round(
+      (polyCoordsToUse.length - 1) * (progress / 100),
+    );
+
+    const completedCoords = polyCoordsToUse.slice(0, splitIdx + 1);
+    const upcomingCoords = polyCoordsToUse.slice(splitIdx);
+
+    const newRefs: { completed: any | null; upcoming: any | null } = {
+      completed: null,
+      upcoming: null,
+    };
+
+    // Draw completed segment (only if > 1 point)
+    if (completedCoords.length > 1) {
+      newRefs.completed = L.polyline(completedCoords, {
+        color: "#2563eb", // Tailwind blue-600 for consistency
+        weight: 4,
+      }).addTo(layerGroup);
+    }
+
+    // Draw upcoming segment (only if > 1 point)
+    if (upcomingCoords.length > 1) {
+      newRefs.upcoming = L.polyline(upcomingCoords, {
+        color: "#9ca3af", // Tailwind gray-400
+        weight: 4,
+        dashArray: "4,6",
+      }).addTo(layerGroup);
+    }
+
+    polylineRef.current = newRefs;
+
     console.timeEnd("markers-update");
-  }, [stops, nextStopId, shapePoints, visible]);
+  }, [stops, nextStopId, shapePoints, visible, progressPercent]);
 
   /* --------------------------------------------------
    * Handle visibility changes – invalidate map size and perform initial fit
@@ -656,6 +698,7 @@ function RouteComponent() {
                       }),
                     )}
                     visible={activeTab === "map"}
+                    progressPercent={progress}
                   />
                 )}
               </div>
