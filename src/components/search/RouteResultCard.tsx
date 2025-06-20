@@ -8,7 +8,8 @@ import {
 import { useRouteTripsQuery } from "~/hooks/useRouteTripsQuery";
 import TripResultCard from "./TripResultCard";
 import { Badge } from "~/components/ui/badge";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ChevronUp, ChevronDown, Heart } from "lucide-react";
+import { useRouteStore } from "~/stores/routeStore";
 
 interface RouteResultItemProps {
   route: RouteType;
@@ -17,6 +18,8 @@ interface RouteResultItemProps {
 export const RouteResultItem = ({ route }: RouteResultItemProps) => {
   const routeName = route.longName || route.shortName || "Unnamed Route";
   const [isExpanded, setIsExpanded] = useState(false);
+  const { favouriteRouteIds, addFavouriteRouteId, removeFavouriteRouteId } =
+    useRouteStore();
 
   // Keep a Set of live trip IDs so we can easily derive the total.
   const [liveTripIds, setLiveTripIds] = useState<Set<string>>(new Set());
@@ -51,6 +54,25 @@ export const RouteResultItem = ({ route }: RouteResultItemProps) => {
         <CollapsibleTrigger asChild>
           <div className="flex cursor-pointer items-center justify-between p-3 sm:p-4">
             <div className="flex items-center gap-3">
+              <Heart
+                className={`h-4 w-4 cursor-pointer ${
+                  favouriteRouteIds.includes(route.id)
+                    ? "fill-red-500 text-red-500"
+                    : "text-gray-500"
+                }`}
+                // Fill the heart when it's marked as favourite and prevent expanding/collapsing when clicking the icon.
+                fill={
+                  favouriteRouteIds.includes(route.id) ? "currentColor" : "none"
+                }
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (favouriteRouteIds.includes(route.id)) {
+                    removeFavouriteRouteId(route.id);
+                  } else {
+                    addFavouriteRouteId(route.id);
+                  }
+                }}
+              />
               <h3 className="text-base font-semibold sm:text-lg">
                 Route {routeName}
               </h3>
