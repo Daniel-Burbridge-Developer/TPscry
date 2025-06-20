@@ -4,6 +4,7 @@ import { useTripLiveStatus } from "~/hooks/useTripLiveStatus";
 import { useTripLiveDetails } from "~/hooks/useTripLiveDetails";
 import { Wifi, WifiOff, ChevronRight } from "lucide-react";
 import { Badge } from "~/components/ui/badge";
+import { Link } from "@tanstack/react-router";
 
 interface TripResultCardProps {
   trip: Trip;
@@ -48,9 +49,21 @@ const TripResultCard = ({
         <span className="text-sm font-medium sm:text-base">
           To: {trip.tripHeadsign ?? "Unknown"}
         </span>
-        <Badge variant={isLive ? "default" : "secondary"} className="text-xs">
-          {isLive ? "Live" : "Offline"}
-        </Badge>
+        {isLive && !fleetId ? (
+          <Badge variant="destructive" className="text-xs">
+            Tracking not available
+          </Badge>
+        ) : (
+          <Badge variant={isLive ? "default" : "secondary"} className="text-xs">
+            {isLive && fleetId ? (
+              <Link to="/livetrack/fleet/$fleetId" params={{ fleetId }}>
+                Live Track
+              </Link>
+            ) : (
+              "Offline"
+            )}
+          </Badge>
+        )}
       </div>
 
       {/* Right section: next stop + ETA + chevron */}

@@ -2,7 +2,6 @@ import React from "react";
 import { useTripLiveStatus } from "~/hooks/useTripLiveStatus";
 import { Trip } from "~/schemas/index";
 import { useTripLiveDetails } from "~/hooks/useTripLiveDetails";
-import { LiveTripProgress } from "~/components/LiveTripProgress";
 
 interface TripCardProps {
   routeName: string;
@@ -16,12 +15,7 @@ const TripCard = ({ trip, routeName }: TripCardProps) => {
 
   const [isExpanded, setIsExpanded] = React.useState(false);
 
-  const {
-    data: liveDetails,
-    isLoading: liveLoading,
-    currentStop,
-    stopsWithDelay,
-  } = useTripLiveDetails(fleetId, {
+  const { isLoading: liveLoading } = useTripLiveDetails(fleetId, {
     enabled: isLive && !!fleetId && isExpanded,
     pollingIntervalMs: 10000,
   });
@@ -68,12 +62,6 @@ const TripCard = ({ trip, routeName }: TripCardProps) => {
             <p className="text-xs text-muted-foreground">
               Loading live progress…
             </p>
-          )}
-          {liveDetails && (
-            <LiveTripProgress
-              stops={stopsWithDelay ?? liveDetails.stops}
-              currentStopId={currentStop?.stopNumber}
-            />
           )}
         </div>
       )}
