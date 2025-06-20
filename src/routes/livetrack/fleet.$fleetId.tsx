@@ -282,16 +282,19 @@ function loadLeaflet() {
 function LiveRouteMap({
   stops,
   nextStopId,
+  currentStopId,
   shapePoints,
   visible,
+  /** Optional fallback percentage of route completed (0–100). Used if we cannot infer position via currentStopId. */
   progressPercent,
 }: {
   stops: readonly StopWithCoords[];
   nextStopId: string | null;
+  /** The last stop that has been departed – used to determine how much of the polyline is complete. */
+  currentStopId: string | null;
   shapePoints: ShapePoint[];
   visible: boolean;
-  /** Percentage of route completed (0–100) */
-  progressPercent: number;
+  progressPercent?: number;
 }) {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -452,12 +455,71 @@ function LiveRouteMap({
 
     const polyCoordsToUse = shapeCoords.length > 1 ? shapeCoords : coordsList;
 
-    // ----- Split polyline into completed vs upcoming based on progressPercent -----
-    // Clamp progressPercent to [0,100]
-    const progress = Math.min(Math.max(progressPercent, 0), 100);
+    // ----- Determine where to split the polyline into completed & upcoming -----
+    let completedCoords: [number, number][] = [];
+    let upcomingCoords: [number, number][] = [];
 
-    // Nothing to draw if we don't have at least two points
-    if (polyCoordsToUse.length < 2) return;
+    const totalCoords = polyCoordsToUse.length;
+
+    const hasCurrentStop =
+      !!currentStopId && stops.some((s) => s.stopNumber === currentStopId);
+
+    if (hasCurrentStop && totalCoords >= 2) {
+      // Identify the coordinates of the current (last departed) stop
+      const currentStop = stops.find((s) => s.stopNumber === currentStopId);
+
+      // Fallback to percent method if we cannot locate lat/lon
+      if (
+        currentStop &&
+        typeof currentStop.lat === "number" &&
+        typeof currentStop.lon === "number"
+      ) {
+        // Find the closest shape point index to the current stop coordinates
+        const targetLat = currentStop.lat;
+        const targetLon = currentStop.lon;
+
+        // First pass – find the minimum distance between the stop and any shape point
+        let minDistSq = Infinity;
+        for (let i = 0; i < totalCoords; i++) {
+          const [plat, plon] = polyCoordsToUse[i];
+          const dLat = plat - targetLat;
+          const dLon = plon - targetLon;
+          const distSq = dLat * dLat + dLon * dLon;
+          if (distSq < minDistSq) {
+            minDistSq = distSq;
+          }
+        }
+
+        // Collect every shape index that is effectively at that same minimum distance (within a tiny epsilon)
+        const EPS = 1e-10;
+        let chosenIdx = 0;
+        for (let i = 0; i < totalCoords; i++) {
+          const [plat, plon] = polyCoordsToUse[i];
+          const dLat = plat - targetLat;
+          const dLon = plon - targetLon;
+          const distSq = dLat * dLat + dLon * dLon;
+          if (Math.abs(distSq - minDistSq) <= EPS) {
+            // Prefer the furthest-along match (largest index) – handles routes that cross over themselves.
+            chosenIdx = Math.max(chosenIdx, i);
+          }
+        }
+
+        completedCoords = polyCoordsToUse.slice(0, chosenIdx + 1);
+        upcomingCoords = polyCoordsToUse.slice(chosenIdx);
+      }
+    }
+
+    // Fallback: use progressPercent (if provided) to split by proportion
+    if (completedCoords.length === 0 && upcomingCoords.length === 0) {
+      const percent = typeof progressPercent === "number" ? progressPercent : 0;
+      const progress = Math.min(Math.max(percent, 0), 100);
+      const splitIdx = Math.round((totalCoords - 1) * (progress / 100));
+      completedCoords = polyCoordsToUse.slice(0, splitIdx + 1);
+      upcomingCoords = polyCoordsToUse.slice(splitIdx);
+    }
+
+    // Nothing to draw if we don't have at least two points (in either segment)
+    if (totalCoords < 2) return;
 
     // Remove any existing polylines before drawing new ones
     if (polylineRef.current) {
@@ -465,14 +527,6 @@ function LiveRouteMap({
       if (completed) completed.remove();
       if (upcoming) upcoming.remove();
     }
-
-    // Determine split index along the coordinates array
-    const splitIdx = Math.round(
-      (polyCoordsToUse.length - 1) * (progress / 100),
-    );
-
-    const completedCoords = polyCoordsToUse.slice(0, splitIdx + 1);
-    const upcomingCoords = polyCoordsToUse.slice(splitIdx);
 
     const newRefs: { completed: any | null; upcoming: any | null } = {
       completed: null,
@@ -499,7 +553,7 @@ function LiveRouteMap({
     polylineRef.current = newRefs;
 
     console.timeEnd("markers-update");
-  }, [stops, nextStopId, shapePoints, visible, progressPercent]);
+  }, [stops, nextStopId, currentStopId, shapePoints, visible, progressPercent]);
 
   /* --------------------------------------------------
    * Handle visibility changes – invalidate map size and perform initial fit
@@ -706,6 +760,7 @@ function RouteComponent() {
                   <LiveRouteMap
                     stops={stopsWithCoords}
                     nextStopId={nextStop?.stopNumber ?? null}
+                    currentStopId={currentStopId}
                     shapePoints={shapePoints.map(
                       ({ lat, lon, Sequence, ...rest }) => ({
                         lat,
