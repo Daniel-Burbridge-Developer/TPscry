@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useExternalStopData } from "~/hooks/useExternalStopData";
 import { apiFetch } from "~/lib/apiClient";
-import { TripSelectZodSchema } from "~/schemas/tripSchema";
+import { TripSelectZodSchema, type Trip } from "~/schemas/tripSchema";
 import { ShapeSelectZodSchema, Shape } from "~/schemas/shapeSchema";
 
 // Helper fetchers
@@ -42,7 +42,7 @@ export const useShapeFromLiveStop = (
   }, [externalQuery.data, routeNumber]);
 
   // Trip query
-  const tripQuery = useQuery({
+  const tripQuery = useQuery<Trip>({
     queryKey: ["trip", liveTripId],
     enabled: !!liveTripId,
     queryFn: () => fetchTrip(liveTripId as string),
@@ -51,7 +51,7 @@ export const useShapeFromLiveStop = (
 
   // Shape query
   const shapeId = tripQuery.data?.shapeId ?? null;
-  const shapeQuery = useQuery({
+  const shapeQuery = useQuery<Shape>({
     queryKey: ["shape", shapeId],
     enabled: !!shapeId,
     queryFn: () => fetchShape(shapeId as string),
