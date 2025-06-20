@@ -37,9 +37,19 @@ const TripResultCard = ({
     onLiveStatusChange(trip.id, isLive);
   }, [isLive, onLiveStatusChange, trip.id]);
 
-  // Prepare the card content so we can optionally wrap it with a Link
-  const cardContent = (
-    <div className="flex cursor-pointer flex-col justify-between gap-2 rounded-lg border bg-white p-3 transition-shadow hover:shadow-md dark:bg-gray-900 sm:flex-row sm:items-center sm:gap-3">
+  // Decide if this card should behave as a link
+  const isNavigable = isLive && !!fleetId;
+
+  const Wrapper: React.ElementType = isNavigable ? Link : "div";
+  const wrapperProps = isNavigable
+    ? { to: "/livetrack/fleet/$fleetId", params: { fleetId } }
+    : {};
+
+  return (
+    <Wrapper
+      {...wrapperProps}
+      className="flex cursor-pointer flex-col justify-between gap-2 rounded-lg border bg-white p-3 transition-shadow hover:shadow-md dark:bg-gray-900 sm:flex-row sm:items-center sm:gap-3"
+    >
       {/* Left section: status icon + destination + badge */}
       <div className="flex items-center gap-3">
         {isLive ? (
@@ -76,18 +86,11 @@ const TripResultCard = ({
             )}
           </div>
         </div>
-        <ChevronRight className="hidden h-4 w-4 text-gray-400 sm:block" />
+        {isNavigable && (
+          <ChevronRight className="hidden h-4 w-4 text-gray-400 sm:block" />
+        )}
       </div>
-    </div>
-  );
-
-  // If the trip is live and we have a fleetId, make the whole card clickable
-  return isLive && fleetId ? (
-    <Link to="/livetrack/fleet/$fleetId" params={{ fleetId }} className="block">
-      {cardContent}
-    </Link>
-  ) : (
-    cardContent
+    </Wrapper>
   );
 };
 

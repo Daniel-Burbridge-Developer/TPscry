@@ -11,9 +11,18 @@ const StopArrivalCard = ({ arrival }: StopArrivalCardProps) => {
   const { liveStatus, busNumber, timeUntilArrival, destination, fleetId } =
     arrival;
 
-  // Prepare the card content so we can optionally wrap it with a Link
-  const cardContent = (
-    <div className="flex cursor-pointer flex-col justify-between gap-2 rounded-lg border bg-white p-3 transition-shadow hover:shadow-md dark:bg-gray-900 sm:flex-row sm:items-center sm:gap-3">
+  const isNavigable = liveStatus && !!fleetId;
+
+  const Wrapper: React.ElementType = isNavigable ? Link : "div";
+  const wrapperProps = isNavigable
+    ? { to: "/livetrack/fleet/$fleetId", params: { fleetId } }
+    : {};
+
+  return (
+    <Wrapper
+      {...wrapperProps}
+      className="flex cursor-pointer flex-col justify-between gap-2 rounded-lg border bg-white p-3 transition-shadow hover:shadow-md dark:bg-gray-900 sm:flex-row sm:items-center sm:gap-3"
+    >
       {/* Left section: live icon + bus number + badge */}
       <div className="flex items-center gap-3">
         {liveStatus ? (
@@ -44,20 +53,11 @@ const StopArrivalCard = ({ arrival }: StopArrivalCardProps) => {
           <div className="text-sm font-medium">{destination}</div>
           <div className="text-xs text-gray-500">ETA: {timeUntilArrival}</div>
         </div>
-        {liveStatus && fleetId && (
+        {isNavigable && (
           <ChevronRight className="hidden h-4 w-4 text-gray-400 sm:block" />
         )}
       </div>
-    </div>
-  );
-
-  // If the arrival has live status and a fleetId, make the whole card clickable
-  return liveStatus && fleetId ? (
-    <Link to="/livetrack/fleet/$fleetId" params={{ fleetId }} className="block">
-      {cardContent}
-    </Link>
-  ) : (
-    cardContent
+    </Wrapper>
   );
 };
 

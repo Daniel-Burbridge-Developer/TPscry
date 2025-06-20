@@ -140,6 +140,10 @@ function StatusCard({
           </div>
         </div>
         <Progress value={progress} className="mt-4 h-2" />
+        <p className="mt-1 text-center text-xs text-red-600 dark:text-red-400">
+          We're currently investigating an issue where route shape data may not
+          load for some trips.
+        </p>
       </CardContent>
     </Card>
   );
