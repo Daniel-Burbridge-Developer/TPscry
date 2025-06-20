@@ -238,6 +238,7 @@ type StopWithCoords = {
   stopName: string;
   stopNumber: string;
   status: string;
+  time: string; // predicted or departed time
   delayMinutes: number;
   lat?: number;
   lon?: number;
@@ -356,8 +357,22 @@ function LiveRouteMap({
           })
         : markerIcon;
 
+      // Build informative popup content
+      const timeLabel =
+        stop.status === "Departed"
+          ? `Departed: ${stop.time}`
+          : `ETA: ${stop.time}`;
+      const delayLabel =
+        stop.delayMinutes > 0 ? ` (+${stop.delayMinutes} min)` : "";
+      const statusLabel = isCurrent
+        ? "Current Stop"
+        : stop.status === "Departed"
+          ? "Completed"
+          : "Upcoming";
+      const popupHtml = `${stop.stopName}<br/>${timeLabel}${delayLabel}<br/>${statusLabel}`;
+
       const marker = L.marker(coords, { icon, title: stop.stopName }).bindPopup(
-        `${stop.stopName}<br/>${isCurrent ? "Current Stop" : stop.status === "Departed" ? "Completed" : "Upcoming"}$${stop.delayMinutes > 0 ? ` (+${stop.delayMinutes} min)` : ""}`,
+        popupHtml,
       );
       marker.addTo(layerGroup);
     });
